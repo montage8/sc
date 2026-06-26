@@ -77,10 +77,14 @@ class ssAppMain(window.SingletonWindow):
         self.locales = self.getLocalesList()
         self.initTranslation()
         self.music = bgtsound.sound()
-        # Stream the background music from disk instead of decoding the whole
-        # file into memory. This keeps memory usage low for large, uncompressed
-        # WAV files (bg.wav).
-        self.music.stream("data/sounds/stream/bg.wav")
+        # Background music is played from a pool of tracks located in the
+        # "bg" folder. A random track is chosen each time, and when it ends a
+        # new random track starts (see updateMusic). The logical playback pitch
+        # is tracked separately so that it is preserved across track changes
+        # (e.g. level-up speedups must carry over to the next track).
+        self.musicList = sorted(glob.glob("data/sounds/stream/bg/*.wav"))
+        self.musicPitch = 100
+        self.musicStarted = False
         self.music.volume = self.options.bgmVolume
         self.numScreams = len(glob.glob("data/sounds/scream*.ogg"))
         self.collectionStorage = collection.CollectionStorage()
@@ -161,8 +165,39 @@ class ssAppMain(window.SingletonWindow):
         # end while intro is playing
         self.thread_loadSounds.join()
         self.updateChecker.wait()
-        self.music.play_looped()
+        self.startMusic()
     # end intro
+
+    def startMusic(self):
+        """Begins background music playback by choosing a random track."""
+        if len(self.musicList) == 0:
+            return
+        self.musicStarted = True
+        self.playRandomMusic()
+
+    def playRandomMusic(self):
+        """Streams a random track from the music pool and applies the current
+        volume and the preserved playback pitch. The track is played once
+        (not looped); updateMusic advances to the next random track when it
+        finishes."""
+        if len(self.musicList) == 0:
+            return
+        self.music.stream(random.choice(self.musicList))
+        self.music.volume = self.options.bgmVolume
+        self.music.pitch = self.musicPitch
+        self.music.play()
+
+    def updateMusic(self):
+        """Called once per frame. When the current track has finished, a new
+        random track is started, preserving the current pitch."""
+        if not self.musicStarted or len(self.musicList) == 0:
+            return
+        if not self.music.playing:
+            self.playRandomMusic()
+
+    def frameUpdate(self):
+        super().frameUpdate()
+        self.updateMusic()
 
     def createMenu(self, title, default=None):
         """Creates a menu instance and returns it.
@@ -785,15 +820,21 @@ Returns False when the game is closed. Otherwise True.
         :param p: Amount
         :type p: int
         """
+        if self.music.handle is None:
+            return
         if self.music.pitch + p > 400:
             return
         self.music.pitch += p
+        self.musicPitch = self.music.pitch
     # end changeMusicPitch_relative
 
     def resetMusicPitch(self, val=100):
         """
         Resets the music's pitch to default. The pitch change will be processed gradually and this method returns when the music is reverted to the normal speed.
         """
+        self.musicPitch = val
+        if not self.musicStarted or self.music.handle is None:
+            return
         while(True):
             if abs(self.music.pitch - val) <= 2:
                 break
@@ -804,6 +845,7 @@ Returns False when the game is closed. Otherwise True.
             self.wait(100)
         # end while
         self.music.pitch = val
+        self.musicPitch = val
     # end resetMusicPitch
 
     def yesno(self, title, top):

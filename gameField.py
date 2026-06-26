@@ -140,6 +140,11 @@ class GameField():
                 self.spawnDebugItem(itemConstants.TYPE_GOOD, itemConstants.GOOD_EXTRALIFE)
         if app.keyPressed(window.K_h):
             self.spawnDebugItem(itemConstants.TYPE_GOOD, random.randint(0, itemConstants.GOOD_MAX))
+        if app.keyPressed(window.K_m):
+            if shift:
+                self.applyGoodEffect(itemConstants.GOOD_MEGATONPUNCH)
+            else:
+                self.spawnDebugItem(itemConstants.TYPE_GOOD, itemConstants.GOOD_MEGATONPUNCH)
 
     def applyGoodEffect(self, identifier):
         """Applies a good item effect to the player as if the item was obtained."""
