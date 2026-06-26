@@ -77,8 +77,10 @@ class ssAppMain(window.SingletonWindow):
         self.locales = self.getLocalesList()
         self.initTranslation()
         self.music = bgtsound.sound()
-        self.musicData = sound_lib.sample.Sample("data/sounds/stream//bg.ogg")
-        self.music.load(self.musicData)
+        # Stream the background music from disk instead of decoding the whole
+        # file into memory. This keeps memory usage low for large, uncompressed
+        # WAV files (bg.wav).
+        self.music.stream("data/sounds/stream/bg.wav")
         self.music.volume = self.options.bgmVolume
         self.numScreams = len(glob.glob("data/sounds/scream*.ogg"))
         self.collectionStorage = collection.CollectionStorage()

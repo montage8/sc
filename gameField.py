@@ -17,6 +17,14 @@ import player
 import window
 
 
+class _DebugItem():
+    """Lightweight stand-in for item.Item used to apply item effects via debug keys."""
+
+    def __init__(self, type, identifier):
+        self.type = type
+        self.identifier = identifier
+
+
 class GameField():
     def initialize(self, x, y, mode, voice, easter=False):
         self.gameTimer = window.Timer()
@@ -72,6 +80,7 @@ class GameField():
     def frameUpdate(self):
         if globalVars.appMain.keyPressed(window.K_s):
             globalVars.appMain.say("%.1f" % self.player.score)
+        self.handleDebugKeys()
         self.collectionCounter.frameUpdate()
         self.modeHandler.frameUpdate()
         self.levelupBonus.frameUpdate()
@@ -99,6 +108,57 @@ class GameField():
                 self.spawnEnemy(i)
         # end for
         return True
+
+    def handleDebugKeys(self):
+        """Handles debug / cheat keys. These work identically in every game mode.
+
+        Uppercase (Shift + letter) applies an effect instantly, while the
+        lowercase letter makes the corresponding item fall from the sky.
+        The lowercase "h" drops a random positive (good) item.
+        """
+        app = globalVars.appMain
+        shift = app.keyPressing(window.K_LSHIFT) or app.keyPressing(window.K_RSHIFT)
+        if app.keyPressed(window.K_d):
+            if shift:
+                self.applyGoodEffect(itemConstants.GOOD_DESTRUCTION)
+            else:
+                self.spawnDebugItem(itemConstants.TYPE_GOOD, itemConstants.GOOD_DESTRUCTION)
+        if app.keyPressed(window.K_b):
+            if shift:
+                self.applyGoodEffect(itemConstants.GOOD_BOOST)
+            else:
+                self.spawnDebugItem(itemConstants.TYPE_GOOD, itemConstants.GOOD_BOOST)
+        if app.keyPressed(window.K_p):
+            if shift:
+                self.applyGoodEffect(itemConstants.GOOD_PENETRATION)
+            else:
+                self.spawnDebugItem(itemConstants.TYPE_GOOD, itemConstants.GOOD_PENETRATION)
+        if app.keyPressed(window.K_e):
+            if shift:
+                self.addExtraLives(300)
+            else:
+                self.spawnDebugItem(itemConstants.TYPE_GOOD, itemConstants.GOOD_EXTRALIFE)
+        if app.keyPressed(window.K_h):
+            self.spawnDebugItem(itemConstants.TYPE_GOOD, random.randint(0, itemConstants.GOOD_MAX))
+
+    def applyGoodEffect(self, identifier):
+        """Applies a good item effect to the player as if the item was obtained."""
+        it = _DebugItem(itemConstants.TYPE_GOOD, identifier)
+        self.player.processItemHit(it)
+
+    def addExtraLives(self, amount):
+        """Instantly grants the player a number of extra lives."""
+        self.player.lives += amount
+        self.log(_("Extra life! (now %(lives)d lives)") % {"lives": self.player.lives})
+        s = bgtsound.sound()
+        s.load(globalVars.appMain.sounds["extraLife.ogg"])
+        s.play()
+
+    def spawnDebugItem(self, type, identifier):
+        """Makes an item of the given type / identifier fall from the sky."""
+        i = item.Item()
+        i.initialize(self, random.randint(0, self.x - 1), random.randint(300, 800), type, identifier)
+        self.items.append(i)
 
     def spawnEnemy(self, slot):
         e = enemy.Enemy()
