@@ -196,6 +196,8 @@ class ssAppMain(window.SingletonWindow):
             self.playRandomMusic()
 
     def frameUpdate(self):
+        """Extends the base per-frame update to also advance the background
+        music playlist (starting the next random track when one ends)."""
         super().frameUpdate()
         self.updateMusic()
 
