@@ -219,7 +219,14 @@ class GameField():
         return self.leftPanningLimit + (self.rightPanningLimit - self.leftPanningLimit) / (self.x - 1) * pos
 
     def getVolume(self, pos):
-        return self.highVolumeLimit - (self.highVolumeLimit - self.lowVolumeLimit) / self.y * pos
+        base = self.highVolumeLimit - (self.highVolumeLimit - self.lowVolumeLimit) / self.y * pos
+        offset = globalVars.appMain.options.sfxVolume
+        result = base + offset
+        if result < self.lowVolumeLimit + offset:
+            result = self.lowVolumeLimit + offset
+        if result > self.highVolumeLimit:
+            result = self.highVolumeLimit
+        return result
 
     def getPitch(self, y):
         return 70 + (y * 3)

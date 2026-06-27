@@ -523,6 +523,7 @@ class ssAppMain(window.SingletonWindow):
         m = self.createMenu(
             _("Options Menu, use your up and down arrows to choose an option, left and right arrows to change values, enter to save or escape to discard changes"))
         m.append(_("Background music volume"))
+        m.append(_("Sound effects volume"))
         m.append(_("Left panning limit"))
         m.append(_("Right panning limit."))
         m.append(_("Item announcement voice"))
@@ -570,7 +571,23 @@ class ssAppMain(window.SingletonWindow):
             self.say("%d" % (abs(-30 - self.options.bgmVolume) * 0.5))
             return
         # end bgm volume
-        if cursor == 1:  # left panning limit
+        if cursor == 1:  # SFX volume
+            if direction == 1 and self.options.sfxVolume == self.options.SFXVOLUME_POSITIVE_BOUNDARY:
+                return
+            if direction == -1 and self.options.sfxVolume == self.options.SFXVOLUME_NEGATIVE_BOUNDARY:
+                return
+            if direction == 1:
+                self.options.sfxVolume += 2
+            if direction == -1:
+                self.options.sfxVolume -= 2
+            s = bgtsound.sound()
+            s.load(self.sounds["change.ogg"])
+            s.volume = self.options.sfxVolume
+            s.play()
+            self.say("%d" % (abs(-30 - self.options.sfxVolume) * 0.5))
+            return
+        # end sfx volume
+        if cursor == 2:  # left panning limit
             if direction == 1 and self.options.leftPanningLimit == self.options.LEFTPANNINGLIMIT_POSITIVE_BOUNDARY:
                 return
             if direction == -1 and self.options.leftPanningLimit == self.options.LEFTPANNINGLIMIT_NEGATIVE_BOUNDARY:
@@ -584,8 +601,8 @@ class ssAppMain(window.SingletonWindow):
             s.pan = self.options.leftPanningLimit
             s.play()
             return
-    # end left panning limit
-        if cursor == 2:  # right panning limit
+        # end left panning limit
+        if cursor == 3:  # right panning limit
             if direction == 1 and self.options.rightPanningLimit == self.options.RIGHTPANNINGLIMIT_POSITIVE_BOUNDARY:
                 return
             if direction == -1 and self.options.rightPanningLimit == self.options.RIGHTPANNINGLIMIT_NEGATIVE_BOUNDARY:
@@ -599,8 +616,8 @@ class ssAppMain(window.SingletonWindow):
             s.pan = self.options.rightPanningLimit
             s.play()
             return
-        # end left panning limit
-        if cursor == 3:  # item voice
+        # end right panning limit
+        if cursor == 4:  # item voice
             c = 0
             for n in self.itemVoices:  # which are we selecting?
                 if self.options.itemVoice == n:
@@ -621,7 +638,7 @@ class ssAppMain(window.SingletonWindow):
             self.options.itemVoice = self.itemVoices[c]
             return
         # end item voices
-        if cursor == 4:  # language
+        if cursor == 5:  # language
             c = 0
             for n in self.locales:  # which are we selecting?
                 if n == self.options.language:
