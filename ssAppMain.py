@@ -12,6 +12,7 @@ import platform
 import platform_utils.paths
 import urllib.request
 import sound_lib.sample
+import sound_lib.external.pybass
 import bgtsound
 import buildSettings
 import collection
@@ -139,7 +140,12 @@ class ssAppMain(window.SingletonWindow):
         self.sounds = {}
         files = glob.glob("data/sounds/*.ogg")
         for elem in files:
-            self.sounds[os.path.basename(elem)] = sound_lib.sample.Sample(elem)
+            # Load with the "override longest playing" flag so that, when a lot
+            # of enemies are on the field and many copies of the same sound play
+            # at once, BASS recycles the oldest channel instead of failing with
+            # BASS_ERROR_NOCHAN (which previously crashed the game on later,
+            # crowded levels).
+            self.sounds[os.path.basename(elem)] = sound_lib.sample.Sample(elem, flags=sound_lib.external.pybass.BASS_SAMPLE_OVER_POS)
     # end loadSounds
 
     def getNumScreams(self):
@@ -817,14 +823,12 @@ Returns False when the game is closed. Otherwise True.
 
     def changeMusicPitch_relative(self, p):
         """
-        Changes the game music's pitch relatively. Positive values will increase (speedup), and negative values will decrease (slow down). If it hits either of the boundaries (50 lowest, 400 highest), this method does nothing.
+        Changes the game music's pitch relatively. Positive values will increase (speedup), and negative values will decrease (slow down). The pitch keeps rising with every level; the only ceiling is what the audio engine can actually play, which is handled gracefully without crashing.
 
         :param p: Amount
         :type p: int
         """
         if self.music.handle is None:
-            return
-        if self.music.pitch + p > 400:
             return
         self.music.pitch += p
         self.musicPitch = self.music.pitch

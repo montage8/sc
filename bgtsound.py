@@ -9,6 +9,7 @@ import sound_lib
 import sound_lib.output
 import sound_lib.sample
 from sound_lib import stream
+from sound_lib.main import BassError
 from dialog import dialog
 o = sound_lib.output.Output()
 
@@ -30,10 +31,19 @@ class sound():
         if self.handle:
             self.close()
 # end close previous
-        self.handle = sound_lib.sample.SampleBasedChannel(sample)
+        try:
+            self.handle = sound_lib.sample.SampleBasedChannel(sample)
+        except BassError:
+            # No free channel was available (e.g. a huge number of enemies are
+            # playing the same sound at once). Degrade gracefully by skipping
+            # this sound instead of crashing the game.
+            self.handle = None
+            return
         self.freq = self.handle.get_frequency()
 
     def play(self):
+        if not self.handle:
+            return
         self.handle.looping = False
         self.handle.play()
 
@@ -51,10 +61,14 @@ class sound():
     # end setPaused
 
     def play_wait(self):
+        if not self.handle:
+            return
         self.handle.looping = False
         self.handle.play_blocking()
 
     def play_looped(self):
+        if not self.handle:
+            return
         self.handle.looping = True
         self.handle.play()
 
@@ -88,11 +102,17 @@ class sound():
 
     @pitch.setter
     def pitch(self, value):
-        if value > 400:
-            value = 400
         if not self.handle:
             return False
-        self.handle.set_frequency((float(value) / 100) * self.freq)
+        if value < 1:
+            value = 1
+        try:
+            self.handle.set_frequency((float(value) / 100) * self.freq)
+        except BassError:
+            # The requested frequency is beyond what the audio engine supports.
+            # Keep the previous (highest achievable) frequency rather than
+            # crashing, so the pitch can keep climbing as far as possible.
+            pass
 
     @property
     def pan(self):
