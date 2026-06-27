@@ -220,10 +220,9 @@ class GameField():
 
     def getVolume(self, pos):
         base = self.highVolumeLimit - (self.highVolumeLimit - self.lowVolumeLimit) / self.y * pos
-        offset = globalVars.appMain.options.sfxVolume
-        result = base + offset
-        if result < self.lowVolumeLimit + offset:
-            result = self.lowVolumeLimit + offset
+        result = base + globalVars.appMain.options.sfxVolume
+        if result < self.lowVolumeLimit:
+            result = self.lowVolumeLimit
         if result > self.highVolumeLimit:
             result = self.highVolumeLimit
         return result
