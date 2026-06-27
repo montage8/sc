@@ -184,18 +184,21 @@ class ssAppMain(window.SingletonWindow):
 
     def playRandomMusic(self):
         """Streams a random track from the music pool and applies the current
-        volume and the preserved playback pitch. The track is played once
-        (not looped); updateMusic advances to the next random track when it
-        finishes."""
+        volume and the preserved playback pitch. The track is looped so that it
+        never finishes on its own: as the pitch keeps rising the track plays
+        faster, but looping the same track keeps the music continuous instead of
+        cutting off and jumping to a different track. This also lets the pitch
+        glide back down smoothly at the end of a game."""
         if len(self.musicList) == 0:
             return
         self.music.stream(random.choice(self.musicList))
         self.music.volume = self.options.bgmVolume
         self.music.pitch = self.musicPitch
-        self.music.play()
+        self.music.play_looped()
 
     def updateMusic(self):
-        """Called once per frame. When the current track has finished, a new
+        """Called once per frame. The current track loops continuously, so this
+        only acts as a safety net: if playback has stopped for any reason a new
         random track is started, preserving the current pitch."""
         if not self.musicStarted or len(self.musicList) == 0:
             return
@@ -203,8 +206,8 @@ class ssAppMain(window.SingletonWindow):
             self.playRandomMusic()
 
     def frameUpdate(self):
-        """Extends the base per-frame update to also advance the background
-        music playlist (starting the next random track when one ends)."""
+        """Extends the base per-frame update to also keep the background music
+        running (restarting it if playback ever stops)."""
         super().frameUpdate()
         self.updateMusic()
 
@@ -842,15 +845,19 @@ Returns False when the game is closed. Otherwise True.
 
     def changeMusicPitch_relative(self, p):
         """
-        Changes the game music's pitch relatively. Positive values will increase (speedup), and negative values will decrease (slow down). The pitch keeps rising with every level; the only ceiling is what the audio engine can actually play, which is handled gracefully without crashing.
+        Changes the game music's pitch relatively. Positive values will increase (speedup), and negative values will decrease (slow down). The pitch is tracked as an unbounded logical value so it keeps rising with every level without limit; the audio engine simply renders it up to whatever frequency it can actually play, and any excess is clamped gracefully without crashing.
 
         :param p: Amount
         :type p: int
         """
+        # Accumulate the logical pitch independently of what the audio engine can
+        # actually render. Reading back self.music.pitch would return the
+        # engine-clamped value, which would stop the pitch from ever climbing past
+        # the engine ceiling; keeping our own counter lets it rise infinitely.
+        self.musicPitch += p
         if self.music.handle is None:
             return
-        self.music.pitch += p
-        self.musicPitch = self.music.pitch
+        self.music.pitch = self.musicPitch
     # end changeMusicPitch_relative
 
     def resetMusicPitch(self, val=100):
