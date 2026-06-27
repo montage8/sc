@@ -87,6 +87,7 @@ class ssAppMain(window.SingletonWindow):
         self.musicPitch = 100
         self.musicStarted = False
         self.music.volume = self.options.bgmVolume
+        bgtsound.setGlobalSfxVolume(self.options.sfxVolume)
         self.numScreams = len(glob.glob("data/sounds/scream*.ogg"))
         self.collectionStorage = collection.CollectionStorage()
         self.collectionStorage.initialize(self.numScreams, COLLECTION_DATA_FILENAME)
@@ -543,6 +544,7 @@ class ssAppMain(window.SingletonWindow):
                 self.options.initialize(backup)
                 self.say(_("Changes discarded."))
                 self.music.volume = self.options.bgmVolume
+                bgtsound.setGlobalSfxVolume(self.options.sfxVolume)
                 return True
             # end if
             if ret >= 0:
@@ -580,9 +582,9 @@ class ssAppMain(window.SingletonWindow):
                 self.options.sfxVolume += 2
             if direction == -1:
                 self.options.sfxVolume -= 2
+            bgtsound.setGlobalSfxVolume(self.options.sfxVolume)
             s = bgtsound.sound()
             s.load(self.sounds["change.ogg"])
-            s.volume = self.options.sfxVolume
             s.play()
             self.say("%d" % (abs(-30 - self.options.sfxVolume) * 0.5))
             return

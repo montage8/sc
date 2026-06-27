@@ -9,9 +9,22 @@ import sound_lib
 import sound_lib.output
 import sound_lib.sample
 from sound_lib import stream
+from sound_lib.external.pybass import BASS_SetConfig, BASS_CONFIG_GVOL_SAMPLE
 from sound_lib.main import BassError
 from dialog import dialog
 o = sound_lib.output.Output()
+
+
+def setGlobalSfxVolume(value):
+    """Sets the global volume of every sample-based sound effect.
+
+    ``value`` uses the same decibel-like unit as ``sound.volume`` (0 means full
+    volume, negative values are quieter). This affects all sound effects at once
+    because they are loaded as BASS samples, while background music and the intro
+    are played as streams and are therefore unaffected."""
+    linear = 10 ** (float(value) / 20)
+    # BASS global sample volume ranges from 0 (silent) to 10000 (full).
+    BASS_SetConfig(BASS_CONFIG_GVOL_SAMPLE, int(round(linear * 10000)))
 
 
 class sound():
