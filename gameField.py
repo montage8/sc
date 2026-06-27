@@ -56,6 +56,14 @@ class GameField():
         self.levelupBonus.initialize()
         self.destructing = False
         self.destructTimer = window.Timer()
+        # Debug repeating destruction (Shift+F): performs an instant destruction
+        # every 0.25 seconds until toggled off, without the powerup prep sound.
+        self.repeatDestructing = False
+        self.repeatDestructTimer = window.Timer()
+        # Debug scheduled destruction (f): performs a user-specified number of
+        # instant destructions, one every 0.5 seconds, without the prep sound.
+        self.scheduledDestructRemaining = 0
+        self.scheduledDestructTimer = window.Timer()
         self.itemVoicePlayer = itemVoicePlayer.ItemVoicePlayer()
         self.itemVoicePlayer.initialize(voice)
         self.destructPowerup = bgtsound.sound()
@@ -89,6 +97,8 @@ class GameField():
                 self.items.remove(elem)
             if elem is not None:
                 elem.frameUpdate()
+        self.updateRepeatDestruction()
+        self.updateScheduledDestruction()
         if self.destructing:
             if self.destructTimer.elapsed >= 1800:
                 self.performDestruction()
@@ -145,6 +155,11 @@ class GameField():
                 self.applyGoodEffect(itemConstants.GOOD_MEGATONPUNCH)
             else:
                 self.spawnDebugItem(itemConstants.TYPE_GOOD, itemConstants.GOOD_MEGATONPUNCH)
+        if app.keyPressed(window.K_f):
+            if shift:
+                self.toggleRepeatDestruction()
+            else:
+                self.promptScheduledDestruction()
 
     def applyGoodEffect(self, identifier):
         """Applies a good item effect to the player as if the item was obtained."""
@@ -267,6 +282,50 @@ class GameField():
                 self.player.processItemHit(elem)
         self.destructing = False
         self.log(_("End destruction!"))
+
+    def toggleRepeatDestruction(self):
+        """Toggles the repeating instant destruction (Shift+F debug key). When
+        enabled, an instant destruction is performed every 0.25 seconds without
+        the powerup prep sound; pressing the key again stops it."""
+        self.repeatDestructing = not self.repeatDestructing
+        if self.repeatDestructing:
+            self.repeatDestructTimer.restart()
+            self.performDestruction()
+
+    def updateRepeatDestruction(self):
+        """Performs a repeating instant destruction every 0.25 seconds while the
+        repeating mode is active. Called once per frame."""
+        if not self.repeatDestructing:
+            return
+        if self.repeatDestructTimer.elapsed >= 250:
+            self.repeatDestructTimer.restart()
+            self.performDestruction()
+
+    def promptScheduledDestruction(self):
+        """Asks the user how many instant destructions to perform (f debug key),
+        then schedules them one every 0.5 seconds without the prep sound."""
+        ret = globalVars.appMain.input(_("Repeat destruction"), _("How many times should destruction repeat (every 0.5 seconds)?"))
+        if ret is None:
+            return
+        try:
+            count = int(ret)
+        except ValueError:
+            return
+        if count <= 0:
+            return
+        self.scheduledDestructTimer.restart()
+        self.performDestruction()
+        self.scheduledDestructRemaining = count - 1
+
+    def updateScheduledDestruction(self):
+        """Performs the remaining scheduled instant destructions, one every 0.5
+        seconds. Called once per frame."""
+        if self.scheduledDestructRemaining <= 0:
+            return
+        if self.scheduledDestructTimer.elapsed >= 500:
+            self.scheduledDestructTimer.restart()
+            self.performDestruction()
+            self.scheduledDestructRemaining -= 1
 # end class GameField
 
     def setPaused(self, p):
@@ -285,4 +344,6 @@ class GameField():
         # end items
         self.player.setPaused(p)
         self.destructTimer.setPaused(p)
+        self.repeatDestructTimer.setPaused(p)
+        self.scheduledDestructTimer.setPaused(p)
         self.gameTimer.setPaused(p)
