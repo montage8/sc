@@ -120,6 +120,8 @@ class sound():
             return False
         if value < 1:
             value = 1
+        # No upper ceiling is enforced here; callers are responsible for
+        # capping the pitch before assigning (e.g. ssAppMain.MUSIC_PITCH_MAX).
         try:
             self.handle.set_frequency((float(value) / 100) * self.freq)
         except BassError:
