@@ -86,6 +86,7 @@ class ssAppMain(window.SingletonWindow):
         self.musicList = sorted(glob.glob("data/sounds/stream/bg/*.wav"))
         self.musicPitch = 100
         self.musicStarted = False
+        self.musicSilencedByHighPitch = False
         self.music.volume = self.options.bgmVolume
         bgtsound.setGlobalSfxVolume(self.options.sfxVolume)
         self.numScreams = len(glob.glob("data/sounds/scream*.ogg"))
@@ -204,6 +205,8 @@ class ssAppMain(window.SingletonWindow):
         treating a stall as the end of the track would make the music switch
         tracks erratically on its own."""
         if not self.musicStarted or len(self.musicList) == 0:
+            return
+        if self.musicSilencedByHighPitch:
             return
         if self.music.stopped:
             self.playRandomMusic()
@@ -389,7 +392,14 @@ class ssAppMain(window.SingletonWindow):
         """
         self.triggerBeforeStartTips(mode)
         result = self.gamePlay(mode)
-        self.resetMusicPitch()
+        if self.musicSilencedByHighPitch:
+            # Pitch exceeded the cap during the game; reset everything and
+            # restart music from scratch so the next game starts at normal speed.
+            self.musicSilencedByHighPitch = False
+            self.musicPitch = 100
+            self.playRandomMusic()
+        else:
+            self.resetMusicPitch()
         self.reviewCollection(result)
         self.resultScreen(result)
         if result.score > 0 and result.validateScore() is True:
@@ -846,18 +856,24 @@ Returns False when the game is closed. Otherwise True.
             self.message(_("Congratulations! Your score has ranked in position %(pos)d! Keep up your great work!") % {"pos": ret})
             return
 
+    # Maximum allowed music pitch (%). Exceeding this silences the music until
+    # the game ends, at which point it is restarted at the normal pitch.
+    MUSIC_PITCH_MAX = 400
+
     def changeMusicPitch_relative(self, p):
         """
-        Changes the game music's pitch relatively. Positive values will increase (speedup), and negative values will decrease (slow down). The pitch is tracked as an unbounded logical value so it keeps rising with every level without limit; the audio engine simply renders it up to whatever frequency it can actually play, and any excess is clamped gracefully without crashing.
+        Changes the game music's pitch relatively. Positive values will increase (speedup), and negative values will decrease (slow down). The pitch is capped at MUSIC_PITCH_MAX; when that ceiling is reached the music is silenced and will be restarted at the normal pitch when the game ends.
 
         :param p: Amount
         :type p: int
         """
-        # Accumulate the logical pitch independently of what the audio engine can
-        # actually render. Reading back self.music.pitch would return the
-        # engine-clamped value, which would stop the pitch from ever climbing past
-        # the engine ceiling; keeping our own counter lets it rise infinitely.
         self.musicPitch += p
+        if self.musicPitch > self.MUSIC_PITCH_MAX:
+            self.musicPitch = self.MUSIC_PITCH_MAX
+            if not self.musicSilencedByHighPitch:
+                self.musicSilencedByHighPitch = True
+                self.music.stop()
+            return
         if self.music.handle is None:
             return
         self.music.pitch = self.musicPitch
