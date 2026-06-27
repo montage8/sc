@@ -22,6 +22,7 @@ def setGlobalSfxVolume(value):
     volume, negative values are quieter). This affects all sound effects at once
     because they are loaded as BASS samples, while background music and the intro
     are played as streams and are therefore unaffected."""
+    # Standard decibel-to-amplitude conversion (0 dB -> 1.0, -20 dB -> 0.1).
     linear = 10 ** (float(value) / 20)
     # BASS global sample volume ranges from 0 (silent) to 10000 (full).
     BASS_SetConfig(BASS_CONFIG_GVOL_SAMPLE, int(round(linear * 10000)))

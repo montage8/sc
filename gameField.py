@@ -219,8 +219,7 @@ class GameField():
         return self.leftPanningLimit + (self.rightPanningLimit - self.leftPanningLimit) / (self.x - 1) * pos
 
     def getVolume(self, pos):
-        base = self.highVolumeLimit - (self.highVolumeLimit - self.lowVolumeLimit) / self.y * pos
-        result = base
+        result = self.highVolumeLimit - (self.highVolumeLimit - self.lowVolumeLimit) / self.y * pos
         if result < self.lowVolumeLimit:
             result = self.lowVolumeLimit
         if result > self.highVolumeLimit:
