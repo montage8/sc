@@ -151,6 +151,22 @@ class sound():
         # end try
         return s
 
+    @property
+    def stopped(self):
+        """True only when the channel has genuinely finished/stopped playing.
+
+        Unlike ``not playing`` this returns False while the channel is merely
+        stalled (its buffer momentarily ran dry, which happens at very high
+        pitch and is automatically resumed by BASS) or paused. Callers that
+        decide whether a track has ended should use this so a temporary stall
+        is not mistaken for the end of the track."""
+        if self.handle is None:
+            return True
+        try:
+            return self.handle.is_stopped
+        except BassError:
+            return True
+
     def close(self):
         if self.handle:
             self.handle.free()

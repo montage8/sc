@@ -184,30 +184,33 @@ class ssAppMain(window.SingletonWindow):
 
     def playRandomMusic(self):
         """Streams a random track from the music pool and applies the current
-        volume and the preserved playback pitch. The track is looped so that it
-        never finishes on its own: as the pitch keeps rising the track plays
-        faster, but looping the same track keeps the music continuous instead of
-        cutting off and jumping to a different track. This also lets the pitch
-        glide back down smoothly at the end of a game."""
+        volume and the preserved playback pitch. The track is played once (not
+        looped); when it genuinely finishes, updateMusic picks a new random
+        track, so the music keeps varying. The preserved pitch carries over to
+        the next track so a level-up speedup is never lost when the track
+        changes."""
         if len(self.musicList) == 0:
             return
         self.music.stream(random.choice(self.musicList))
         self.music.volume = self.options.bgmVolume
         self.music.pitch = self.musicPitch
-        self.music.play_looped()
+        self.music.play()
 
     def updateMusic(self):
-        """Called once per frame. The current track loops continuously, so this
-        only acts as a safety net: if playback has stopped for any reason a new
-        random track is started, preserving the current pitch."""
+        """Called once per frame. Starts a new random track only when the
+        current one has genuinely ended. We deliberately check ``stopped``
+        rather than ``not playing``: at very high pitch the stream can briefly
+        stall (its buffer runs dry) and BASS resumes it automatically, so
+        treating a stall as the end of the track would make the music switch
+        tracks erratically on its own."""
         if not self.musicStarted or len(self.musicList) == 0:
             return
-        if not self.music.playing:
+        if self.music.stopped:
             self.playRandomMusic()
 
     def frameUpdate(self):
-        """Extends the base per-frame update to also keep the background music
-        running (restarting it if playback ever stops)."""
+        """Extends the base per-frame update to also advance the background
+        music playlist (starting the next random track when one ends)."""
         super().frameUpdate()
         self.updateMusic()
 
@@ -862,18 +865,31 @@ Returns False when the game is closed. Otherwise True.
 
     def resetMusicPitch(self, val=100):
         """
-        Resets the music's pitch to default. The pitch change will be processed gradually and this method returns when the music is reverted to the normal speed.
+        Resets the music's pitch to default. The pitch change is processed
+        gradually and this method returns when the music has reverted to the
+        target speed.
+
+        The logical pitch (self.musicPitch) is kept in step with the audible
+        pitch on every step of the glide rather than being set to the target up
+        front. This matters because the track may genuinely end mid-glide (at
+        very high pitch tracks finish quickly); updateMusic would then start a
+        new random track using self.musicPitch, and we want that track to come
+        in at the current gliding pitch so the descent continues smoothly
+        instead of snapping straight to the target.
         """
-        self.musicPitch = val
         if not self.musicStarted or self.music.handle is None:
+            self.musicPitch = val
             return
         while(True):
-            if abs(self.music.pitch - val) <= 2:
+            current = self.music.pitch
+            if abs(current - val) <= 2:
                 break
-            if self.music.pitch < val:
-                self.music.pitch += 2
+            if current < val:
+                current += 2
             else:
-                self.music.pitch -= 2
+                current -= 2
+            self.musicPitch = current
+            self.music.pitch = current
             self.wait(100)
         # end while
         self.music.pitch = val
