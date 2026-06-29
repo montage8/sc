@@ -253,6 +253,9 @@ class Player():
             s.pitch = 60 + (self.lives * 10)
             s.play()
             return
+        if it.identifier == itemConstants.GOOD_RESETENEMIES:
+            self.field.resetEnemies()
+            return
 
     def findEffect(self, name):
         """

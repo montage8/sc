@@ -150,6 +150,16 @@ class GameField():
                 self.spawnDebugItem(itemConstants.TYPE_GOOD, itemConstants.GOOD_EXTRALIFE)
         if app.keyPressed(window.K_h):
             self.spawnDebugItem(itemConstants.TYPE_GOOD, random.randint(0, itemConstants.GOOD_MAX))
+        if app.keyPressed(window.K_g):
+            if shift:
+                self.applyGoodEffect(itemConstants.GOOD_RESETENEMIES)
+            else:
+                self.spawnDebugItem(itemConstants.TYPE_GOOD, itemConstants.GOOD_RESETENEMIES)
+        if app.keyPressed(window.K_c):
+            if shift:
+                self.addStoredDestruction(3000)
+            else:
+                self.promptStoredDestruction()
         if app.keyPressed(window.K_m):
             if shift:
                 self.applyGoodEffect(itemConstants.GOOD_MEGATONPUNCH)
@@ -173,6 +183,41 @@ class GameField():
         s = bgtsound.sound()
         s.load(globalVars.appMain.sounds["extraLife.ogg"])
         s.play()
+
+    def resetEnemies(self):
+        """Resets the number of enemies back to the starting count of one.
+
+        The number of enemy slots grows by one on every level-up and never
+        shrinks, so a long game accumulates so many enemies that performance
+        degrades. Obtaining the reset item collapses the field back to a single
+        enemy, keeping the score intact while emptying the enemy roster down to a
+        single slot and restarting the level count from one (so the per-frame
+        loop, which iterates over ``self.level`` slots, stays consistent)."""
+        self.level = 1
+        self.enemies = [None]
+        self.log(_("The number of enemies has been reset to one!"))
+
+    def setStoredDestruction(self, amount):
+        """Sets the player's stored (auto) destruction count to a fixed value."""
+        if amount < 0:
+            amount = 0
+        self.player.autoDestructionRemaining = amount
+        self.log(_("Stored destruction count is now %(r)d!") % {"r": self.player.autoDestructionRemaining})
+
+    def addStoredDestruction(self, amount):
+        """Adds to the player's stored (auto) destruction count (Shift+C)."""
+        self.setStoredDestruction(self.player.autoDestructionRemaining + amount)
+
+    def promptStoredDestruction(self):
+        """Asks the user for an exact stored destruction count (c debug key)."""
+        ret = globalVars.appMain.input(_("Stored destruction"), _("How many stored destructions should you have?"))
+        if ret is None:
+            return
+        try:
+            count = int(ret)
+        except ValueError:
+            return
+        self.setStoredDestruction(count)
 
     def spawnDebugItem(self, type, identifier):
         """Makes an item of the given type / identifier fall from the sky."""
