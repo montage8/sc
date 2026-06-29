@@ -109,7 +109,7 @@ class GameField():
             self.log(_("Game over! Final score: %(score)d") % {"score": self.player.score})
             return False
         # end if
-        for i in range(self.level):
+        for i in range(len(self.enemies)):
             if self.enemies[i] is not None and self.enemies[i].state == enemy.STATE_SHOULDBEDELETED:
                 self.enemies[i] = None
             if self.enemies[i] is not None:
@@ -185,15 +185,16 @@ class GameField():
         s.play()
 
     def resetEnemies(self):
-        """Resets the number of enemies back to the starting count of one.
+        """Empties the enemy roster down to a single enemy without disturbing
+        the player's score.
 
-        The number of enemy slots grows by one on every level-up and never
-        shrinks, so a long game accumulates so many enemies that performance
-        degrades. Obtaining the reset item collapses the field back to a single
-        enemy, keeping the score intact while emptying the enemy roster down to a
-        single slot and restarting the level count from one (so the per-frame
-        loop, which iterates over ``self.level`` slots, stays consistent)."""
-        self.level = 1
+        The enemy roster grows by one on every level-up and never shrinks, so a
+        long game accumulates so many enemies that performance degrades and the
+        field becomes overwhelming. Obtaining the reset item collapses the field
+        back to a single enemy to give the player relief. The level count is left
+        untouched so accumulated score and the score multiplier are fully
+        preserved; the per-frame loop iterates over the enemy roster itself
+        rather than ``self.level``, so the shorter roster stays consistent."""
         self.enemies = [None]
         self.log(_("The number of enemies has been reset to one!"))
 
