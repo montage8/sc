@@ -28,3 +28,10 @@ NAMES[TYPE_NASTY] = {NASTY_SHRINK: "Shrink",
 NAMES[TYPE_GOOD] = {GOOD_MEGATONPUNCH: "Megaton punch", GOOD_BOOST: "Boost",
                     GOOD_PENETRATION: "Penetration", GOOD_DESTRUCTION: "Destruction", GOOD_EXTRALIFE: "Extra life",
                     GOOD_RESETENEMIES: "Reset enemies"}
+
+# Good items that are allowed to drop randomly (item shower / random good
+# item spawns). Some good items, such as Reset enemies, are intentionally
+# excluded because they must only be triggered manually (e.g. the lowercase
+# "g" debug key) and never fall from the sky in any game mode.
+GOOD_RANDOM_ITEMS = [GOOD_MEGATONPUNCH, GOOD_BOOST,
+                     GOOD_PENETRATION, GOOD_DESTRUCTION, GOOD_EXTRALIFE]
