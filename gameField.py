@@ -149,7 +149,7 @@ class GameField():
             else:
                 self.spawnDebugItem(itemConstants.TYPE_GOOD, itemConstants.GOOD_EXTRALIFE)
         if app.keyPressed(window.K_h):
-            self.spawnDebugItem(itemConstants.TYPE_GOOD, random.randint(0, itemConstants.GOOD_MAX))
+            self.spawnDebugItem(itemConstants.TYPE_GOOD, random.choice(itemConstants.GOOD_RANDOM_ITEMS))
         if app.keyPressed(window.K_g):
             if shift:
                 self.applyGoodEffect(itemConstants.GOOD_RESETENEMIES)
