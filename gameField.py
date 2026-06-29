@@ -185,17 +185,32 @@ class GameField():
         s.play()
 
     def resetEnemies(self):
-        """Empties the enemy roster down to a single enemy without disturbing
-        the player's score.
+        """Resets the enemy progression back to the exact state of a fresh game
+        start, while preserving the player's accumulated score.
 
         The enemy roster grows by one on every level-up and never shrinks, so a
         long game accumulates so many enemies that performance degrades and the
-        field becomes overwhelming. Obtaining the reset item collapses the field
-        back to a single enemy to give the player relief. The level count is left
-        untouched so accumulated score and the score multiplier are fully
-        preserved; the per-frame loop iterates over the enemy roster itself
-        rather than ``self.level``, so the shorter roster stays consistent."""
-        self.enemies = [None]
+        field becomes overwhelming. Obtaining the reset item should give the
+        player relief by collapsing the field back to a single enemy and then
+        letting the enemy count climb again the same way it does at the very
+        beginning of a game.
+
+        At game start (see ``__init__``) the level is ``1``, the enemy roster
+        holds a single slot, the defeat count is ``0`` and ``nextLevelup`` is
+        seeded from :meth:`calculateNextLevelup`. Because the number of defeats
+        required for the next level-up grows with the level, leaving the level
+        high made regrowth take a very long time and then jump unevenly. Mirror
+        the initial state instead so enemies start increasing right away and ramp
+        up gradually, exactly like a new game. The player's accumulated
+        ``player.score`` is intentionally left untouched."""
+        self.level = 1
+        if self.easter:
+            self.level = 10
+        self.enemies = []
+        for i in range(self.level):
+            self.enemies.append(None)
+        self.defeats = 0
+        self.nextLevelup = self.modeHandler.calculateNextLevelup()
         self.log(_("The number of enemies has been reset to one!"))
 
     def setStoredDestruction(self, amount):
