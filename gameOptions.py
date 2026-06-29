@@ -11,6 +11,8 @@ class GameOptions:
     def __init__(self):
         self.BGMVOLUME_NEGATIVE_BOUNDARY = -30
         self.BGMVOLUME_POSITIVE_BOUNDARY = 0
+        self.SFXVOLUME_NEGATIVE_BOUNDARY = -30
+        self.SFXVOLUME_POSITIVE_BOUNDARY = 0
         self.LEFTPANNINGLIMIT_NEGATIVE_BOUNDARY = -100
         self.LEFTPANNINGLIMIT_POSITIVE_BOUNDARY = -20
         self.RIGHTPANNINGLIMIT_NEGATIVE_BOUNDARY = 20
@@ -29,6 +31,7 @@ class GameOptions:
 
     def setDefault(self):
         self.bgmVolume = -10
+        self.sfxVolume = 0
         self.leftPanningLimit = -100
         self.rightPanningLimit = 100
         self.itemVoice = "chris"
@@ -40,6 +43,7 @@ class GameOptions:
 
     def copyFrom(self, importer):
         self.bgmVolume = importer.bgmVolume
+        self.sfxVolume = importer.sfxVolume
         self.leftPanningLimit = importer.leftPanningLimit
         self.rightPanningLimit = importer.rightPanningLimit
         self.itemVoice = importer.itemVoice
@@ -71,9 +75,14 @@ class GameOptions:
             self.rightPanningLimit = self.RIGHTPANNINGLIMIT_NEGATIVE_BOUNDARY
         self.itemVoice = values[3]
         self.language = values[4] if numValues > 4 else locale.getdefaultlocale()[0]
+        self.sfxVolume = int(values[5]) if numValues > 5 else 0
+        if self.sfxVolume < self.SFXVOLUME_NEGATIVE_BOUNDARY:
+            self.sfxVolume = self.SFXVOLUME_NEGATIVE_BOUNDARY
+        if self.sfxVolume > self.SFXVOLUME_POSITIVE_BOUNDARY:
+            self.sfxVolume = self.SFXVOLUME_POSITIVE_BOUNDARY
         return True
 
     def save(self, filename):
-        s = "%d#%d#%d#%s#%s" % (self.bgmVolume, self.leftPanningLimit, self.rightPanningLimit, self.itemVoice, self.language)
+        s = "%d#%d#%d#%s#%s#%d" % (self.bgmVolume, self.leftPanningLimit, self.rightPanningLimit, self.itemVoice, self.language, self.sfxVolume)
         with open(filename, mode="w") as f:
             f.write(s)

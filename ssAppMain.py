@@ -12,6 +12,7 @@ import platform
 import platform_utils.paths
 import urllib.request
 import sound_lib.sample
+import sound_lib.external.pybass
 import bgtsound
 import buildSettings
 import collection
@@ -77,9 +78,17 @@ class ssAppMain(window.SingletonWindow):
         self.locales = self.getLocalesList()
         self.initTranslation()
         self.music = bgtsound.sound()
-        self.musicData = sound_lib.sample.Sample("data/sounds/stream//bg.ogg")
-        self.music.load(self.musicData)
+        # Background music is played from a pool of tracks located in the
+        # "bg" folder. A random track is chosen each time, and when it ends a
+        # new random track starts (see updateMusic). The logical playback pitch
+        # is tracked separately so that it is preserved across track changes
+        # (e.g. level-up speedups must carry over to the next track).
+        self.musicList = sorted(glob.glob("data/sounds/stream/bg/*.wav"))
+        self.musicPitch = 100
+        self.musicStarted = False
+        self.musicSilencedByHighPitch = False
         self.music.volume = self.options.bgmVolume
+        bgtsound.setGlobalSfxVolume(self.options.sfxVolume)
         self.numScreams = len(glob.glob("data/sounds/scream*.ogg"))
         self.collectionStorage = collection.CollectionStorage()
         self.collectionStorage.initialize(self.numScreams, COLLECTION_DATA_FILENAME)
@@ -133,7 +142,12 @@ class ssAppMain(window.SingletonWindow):
         self.sounds = {}
         files = glob.glob("data/sounds/*.ogg")
         for elem in files:
-            self.sounds[os.path.basename(elem)] = sound_lib.sample.Sample(elem)
+            # Load with the "override longest playing" flag so that, when a lot
+            # of enemies are on the field and many copies of the same sound play
+            # at once, BASS recycles the oldest channel instead of failing with
+            # BASS_ERROR_NOCHAN (which previously crashed the game on later,
+            # crowded levels).
+            self.sounds[os.path.basename(elem)] = sound_lib.sample.Sample(elem, flags=sound_lib.external.pybass.BASS_SAMPLE_OVER_POS)
     # end loadSounds
 
     def getNumScreams(self):
@@ -159,8 +173,49 @@ class ssAppMain(window.SingletonWindow):
         # end while intro is playing
         self.thread_loadSounds.join()
         self.updateChecker.wait()
-        self.music.play_looped()
+        self.startMusic()
     # end intro
+
+    def startMusic(self):
+        """Begins background music playback by choosing a random track."""
+        if len(self.musicList) == 0:
+            return
+        self.musicStarted = True
+        self.playRandomMusic()
+
+    def playRandomMusic(self):
+        """Streams a random track from the music pool and applies the current
+        volume and the preserved playback pitch. The track is played once (not
+        looped); when it genuinely finishes, updateMusic picks a new random
+        track, so the music keeps varying. The preserved pitch carries over to
+        the next track so a level-up speedup is never lost when the track
+        changes."""
+        if len(self.musicList) == 0:
+            return
+        self.music.stream(random.choice(self.musicList))
+        self.music.volume = self.options.bgmVolume
+        self.music.pitch = self.musicPitch
+        self.music.play()
+
+    def updateMusic(self):
+        """Called once per frame. Starts a new random track only when the
+        current one has genuinely ended. We deliberately check ``stopped``
+        rather than ``not playing``: at very high pitch the stream can briefly
+        stall (its buffer runs dry) and BASS resumes it automatically, so
+        treating a stall as the end of the track would make the music switch
+        tracks erratically on its own."""
+        if not self.musicStarted or len(self.musicList) == 0:
+            return
+        if self.musicSilencedByHighPitch:
+            return
+        if self.music.stopped:
+            self.playRandomMusic()
+
+    def frameUpdate(self):
+        """Extends the base per-frame update to also advance the background
+        music playlist (starting the next random track when one ends)."""
+        super().frameUpdate()
+        self.updateMusic()
 
     def createMenu(self, title, default=None):
         """Creates a menu instance and returns it.
@@ -337,7 +392,14 @@ class ssAppMain(window.SingletonWindow):
         """
         self.triggerBeforeStartTips(mode)
         result = self.gamePlay(mode)
-        self.resetMusicPitch()
+        if self.musicSilencedByHighPitch:
+            # Pitch exceeded the cap during the game; reset everything and
+            # restart music from scratch so the next game starts at normal speed.
+            self.musicSilencedByHighPitch = False
+            self.musicPitch = 100
+            self.playRandomMusic()
+        else:
+            self.resetMusicPitch()
         self.reviewCollection(result)
         self.resultScreen(result)
         if result.score > 0 and result.validateScore() is True:
@@ -478,6 +540,7 @@ class ssAppMain(window.SingletonWindow):
         m = self.createMenu(
             _("Options Menu, use your up and down arrows to choose an option, left and right arrows to change values, enter to save or escape to discard changes"))
         m.append(_("Background music volume"))
+        m.append(_("Sound effects volume"))
         m.append(_("Left panning limit"))
         m.append(_("Right panning limit."))
         m.append(_("Item announcement voice"))
@@ -497,6 +560,7 @@ class ssAppMain(window.SingletonWindow):
                 self.options.initialize(backup)
                 self.say(_("Changes discarded."))
                 self.music.volume = self.options.bgmVolume
+                bgtsound.setGlobalSfxVolume(self.options.sfxVolume)
                 return True
             # end if
             if ret >= 0:
@@ -525,7 +589,23 @@ class ssAppMain(window.SingletonWindow):
             self.say("%d" % (abs(-30 - self.options.bgmVolume) * 0.5))
             return
         # end bgm volume
-        if cursor == 1:  # left panning limit
+        if cursor == 1:  # SFX volume
+            if direction == 1 and self.options.sfxVolume == self.options.SFXVOLUME_POSITIVE_BOUNDARY:
+                return
+            if direction == -1 and self.options.sfxVolume == self.options.SFXVOLUME_NEGATIVE_BOUNDARY:
+                return
+            if direction == 1:
+                self.options.sfxVolume += 2
+            if direction == -1:
+                self.options.sfxVolume -= 2
+            bgtsound.setGlobalSfxVolume(self.options.sfxVolume)
+            s = bgtsound.sound()
+            s.load(self.sounds["change.ogg"])
+            s.play()
+            self.say("%d" % (abs(-30 - self.options.sfxVolume) * 0.5))
+            return
+        # end sfx volume
+        if cursor == 2:  # left panning limit
             if direction == 1 and self.options.leftPanningLimit == self.options.LEFTPANNINGLIMIT_POSITIVE_BOUNDARY:
                 return
             if direction == -1 and self.options.leftPanningLimit == self.options.LEFTPANNINGLIMIT_NEGATIVE_BOUNDARY:
@@ -539,8 +619,8 @@ class ssAppMain(window.SingletonWindow):
             s.pan = self.options.leftPanningLimit
             s.play()
             return
-    # end left panning limit
-        if cursor == 2:  # right panning limit
+        # end left panning limit
+        if cursor == 3:  # right panning limit
             if direction == 1 and self.options.rightPanningLimit == self.options.RIGHTPANNINGLIMIT_POSITIVE_BOUNDARY:
                 return
             if direction == -1 and self.options.rightPanningLimit == self.options.RIGHTPANNINGLIMIT_NEGATIVE_BOUNDARY:
@@ -554,8 +634,8 @@ class ssAppMain(window.SingletonWindow):
             s.pan = self.options.rightPanningLimit
             s.play()
             return
-        # end left panning limit
-        if cursor == 3:  # item voice
+        # end right panning limit
+        if cursor == 4:  # item voice
             c = 0
             for n in self.itemVoices:  # which are we selecting?
                 if self.options.itemVoice == n:
@@ -576,7 +656,7 @@ class ssAppMain(window.SingletonWindow):
             self.options.itemVoice = self.itemVoices[c]
             return
         # end item voices
-        if cursor == 4:  # language
+        if cursor == 5:  # language
             c = 0
             for n in self.locales:  # which are we selecting?
                 if n == self.options.language:
@@ -776,32 +856,60 @@ Returns False when the game is closed. Otherwise True.
             self.message(_("Congratulations! Your score has ranked in position %(pos)d! Keep up your great work!") % {"pos": ret})
             return
 
+    # Maximum allowed music pitch (%). Exceeding this silences the music until
+    # the game ends, at which point it is restarted at the normal pitch.
+    MUSIC_PITCH_MAX = 400
+
     def changeMusicPitch_relative(self, p):
         """
-        Changes the game music's pitch relatively. Positive values will increase (speedup), and negative values will decrease (slow down). If it hits either of the boundaries (50 lowest, 400 highest), this method does nothing.
+        Changes the game music's pitch relatively. Positive values will increase (speedup), and negative values will decrease (slow down). The pitch is capped at MUSIC_PITCH_MAX; when that ceiling is reached the music is silenced and will be restarted at the normal pitch when the game ends.
 
         :param p: Amount
         :type p: int
         """
-        if self.music.pitch + p > 400:
+        self.musicPitch += p
+        if self.musicPitch > self.MUSIC_PITCH_MAX:
+            self.musicPitch = self.MUSIC_PITCH_MAX
+            if not self.musicSilencedByHighPitch:
+                self.musicSilencedByHighPitch = True
+                self.music.stop()
             return
-        self.music.pitch += p
+        if self.music.handle is None:
+            return
+        self.music.pitch = self.musicPitch
     # end changeMusicPitch_relative
 
     def resetMusicPitch(self, val=100):
         """
-        Resets the music's pitch to default. The pitch change will be processed gradually and this method returns when the music is reverted to the normal speed.
+        Resets the music's pitch to default. The pitch change is processed
+        gradually and this method returns when the music has reverted to the
+        target speed.
+
+        The logical pitch (self.musicPitch) is kept in step with the audible
+        pitch on every step of the glide rather than being set to the target up
+        front. This matters because the track may genuinely end mid-glide (at
+        very high pitch tracks finish quickly); updateMusic would then start a
+        new random track using self.musicPitch, and we want that track to come
+        in at the current gliding pitch so the descent continues smoothly
+        instead of snapping straight to the target.
         """
+        if not self.musicStarted or self.music.handle is None:
+            self.musicPitch = val
+            return
         while(True):
-            if abs(self.music.pitch - val) <= 2:
+            current = self.music.pitch
+            if abs(current - val) <= 2:
                 break
-            if self.music.pitch < val:
-                self.music.pitch += 2
+            if current < val:
+                current += 2
             else:
-                self.music.pitch -= 2
+                current -= 2
+            self.musicPitch = current
+            self.music.pitch = current
             self.wait(100)
         # end while
         self.music.pitch = val
+        self.musicPitch = val
     # end resetMusicPitch
 
     def yesno(self, title, top):
