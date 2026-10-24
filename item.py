@@ -63,11 +63,11 @@ class Item():
         if self.y != 0:
             return False
         self.switchState(STATE_BROKEN)
-        self.field.log(_("A \"%(item)s\" item fell on the ground and shattered into peaces!") % {"item": NAMES[self.type][self.identifier]})
+        self.field.log(_("A \"%(item)s\" item fell on the ground and shattered into peaces!") % {"item": _(NAMES[self.type][self.identifier])})
         return True
 
     def obtain(self):
-        self.field.log(_("Obtained a \"%(item)s\" item!") % {"item": NAMES[self.type][self.identifier]})
+        self.field.log(_("Obtained a \"%(item)s\" item!") % {"item": _(NAMES[self.type][self.identifier])})
         s = bgtsound.sound()
         s.load(globalVars.appMain.sounds["hit.ogg"])
         s.pan = self.field.getPan(self.x)
@@ -92,7 +92,7 @@ class Item():
         self.destroy()
 
     def destroy(self):
-        self.field.log(_("A \"%(item)s\" item was shattered into peaces!") % {"item": NAMES[self.type][self.identifier]})
+        self.field.log(_("A \"%(item)s\" item was shattered into peaces!") % {"item": _(NAMES[self.type][self.identifier])})
         self.switchState(STATE_BROKEN)
 
     def playShatter(self):

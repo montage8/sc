@@ -37,6 +37,17 @@ STATS_DATA_FILENAME = appDataPath + "/stats.dat"
 LAST_VERSION_FILENAME = appDataPath + "/lastVersion.dat"
 OPTIONS_FILENAME = appDataPath + "/options.dat"
 
+# Names of the available languages, spoken when the language setting is changed.
+# The values are written in each language itself, so they stay readable no
+# matter which language is currently loaded.
+LANGUAGE_NAMES = {
+    "en_US": "English",
+    "ja_JP": "日本語",
+    "ko_KR": "한국어",
+    "tr_TR": "Türkçe",
+    "v_VN": "Tiếng Việt",
+}
+
 
 class ssAppMain(window.SingletonWindow):
     """
@@ -126,6 +137,20 @@ class ssAppMain(window.SingletonWindow):
                 lst.append(os.path.basename(elem))
         return lst
 
+    def getLanguageName(self, code):
+        """
+        Returns a speakable name for the given locale code.
+
+        :param code: Locale folder name, such as ko_KR.
+        :type code: str
+
+        :rtype: str
+        """
+        if code in LANGUAGE_NAMES:
+            return LANGUAGE_NAMES[code]
+        return code
+    # end getLanguageName
+
     def getLocalesList(self):
         """
         Searches for available languages. Returns the list of found languages.
@@ -133,7 +158,7 @@ class ssAppMain(window.SingletonWindow):
         :rtype: list
         """
         lst = []
-        for elem in glob.glob("locale/*"):
+        for elem in sorted(glob.glob("locale/*")):
             if os.path.isdir(elem):
                 lst.append(os.path.basename(elem))
         return lst
@@ -678,7 +703,7 @@ class ssAppMain(window.SingletonWindow):
             if direction == -1 and c == 0:
                 return  # clipping
             c += direction
-            self.say(self.locales[c])
+            self.say(self.getLanguageName(self.locales[c]))
             self.options.language = self.locales[c]
             return
         # end item voices

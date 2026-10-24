@@ -1,0 +1,733 @@
+# Korean translation of Screaming Strike.
+#
+# Copyright (C) 2019 Yukio Nozawa <personal@nyanchangames.com>
+# This file is distributed under the same license as the screamingStrike package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: screamingStrike\n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: 2026-10-25 00:00+0900\n"
+"Last-Translator: Korean translation\n"
+"Language-Team: Korean\n"
+"Language: ko_KR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: ssAppMain.py:404
+msgid " already exists. Do you want to overwrite?"
+msgstr " 파일이 이미 있습니다. 덮어쓸까요?"
+
+#: gameField.py:64
+msgid " mode"
+msgstr " 모드"
+
+#: player.py:137
+#, python-format
+msgid "%(hits)d consecutive hits bonus!"
+msgstr "%(hits)d연속 명중 보너스!"
+
+#: gameResult.py:39
+#, python-format
+msgid "%(min)d %(minunit)s and %(sec)d %(secunit)s"
+msgstr "%(min)d%(minunit)s %(sec)d%(secunit)s"
+
+#: player.py:148
+#, python-format
+msgid "%(misses)d consecutive misses penalty!"
+msgstr "%(misses)d연속 실패 감점!"
+
+#: itemEffects.py:60
+#, python-format
+msgid "%(name)s: %(sec).2f seconds left"
+msgstr "%(name)s: %(sec).2f초 남음"
+
+#: ssAppMain.py:722
+#, python-format
+msgid "%(playmode)s, high score %(highscore)s, start!"
+msgstr "%(playmode)s, 최고 점수 %(highscore)s, 시작!"
+
+#: ssAppMain.py:687
+#, python-format
+msgid "%(voice)s cannot be loaded."
+msgstr "%(voice)s 파일을 불러올 수 없습니다."
+
+#: ssAppMain.py:788
+msgid "-- Last 10 logs --"
+msgstr "-- 최근 기록 10개 --"
+
+#: item.py:66
+#, python-format
+msgid "A \"%(item)s\" item fell on the ground and shattered into peaces!"
+msgstr "\"%(item)s\" 아이템이 바닥에 떨어져 산산조각났습니다!"
+
+#: item.py:95
+#, python-format
+msgid "A \"%(item)s\" item was shattered into peaces!"
+msgstr "\"%(item)s\" 아이템이 산산조각났습니다!"
+
+#: itemEffects.py:37
+#, python-format
+msgid "A new \"%(item)s\" effect is starting!"
+msgstr "새로운 \"%(item)s\" 효과가 시작됩니다!"
+
+#: gameField.py:487
+msgid "Activating destruction!"
+msgstr "파괴를 발동합니다!"
+
+#: ssAppMain.py:784
+#, python-format
+msgid "Active item effects: %(fx)d"
+msgstr "활성화된 아이템 효과: %(fx)d개"
+
+#: ssAppMain.py:272
+msgid "Arcade mode"
+msgstr "아케이드 모드"
+
+#: ssAppMain.py:482 ssAppMain.py:505 ssAppMain.py:546
+msgid "Back"
+msgstr "뒤로"
+
+#: ssAppMain.py:577
+msgid "Background music volume"
+msgstr "배경 음악 음량"
+
+#: itemConstants.py
+msgid "Blurred"
+msgstr "흐림"
+
+#: itemConstants.py
+msgid "Boost"
+msgstr "부스트"
+
+#: ssAppMain.py:274
+msgid "Burden mode"
+msgstr "버든 모드"
+
+#: ssAppMain.py:1086
+msgid "Changelog"
+msgstr "변경 내역"
+
+#: ssAppMain.py:596
+msgid "Changes discarded."
+msgstr "변경 사항을 취소했습니다."
+
+#: ssAppMain.py:1048
+msgid "Choose 'Forcefully shutdown' or alt+f4 to abort the download."
+msgstr "'강제 종료'를 선택하거나 알트+F4를 눌러 다운로드를 중단하세요."
+
+#: ssAppMain.py:273
+msgid "Classic mode"
+msgstr "클래식 모드"
+
+#: ssAppMain.py:824
+msgid "Close"
+msgstr "닫기"
+
+#: gameField.py:250
+#, python-format
+msgid "Collected %(count)d falling item(s) at once! (good and nasty)"
+msgstr "떨어지던 아이템 %(count)d개를 한꺼번에 획득했습니다! (좋은 것과 나쁜 것 모두)"
+
+#: ssAppMain.py:286
+msgid "Collection"
+msgstr "수집"
+
+#: ssAppMain.py:546
+msgid "Collections"
+msgstr "수집품"
+
+#: ssAppMain.py:898
+#, python-format
+msgid "Congratulations! Your score has ranked in position %(pos)d! Keep up your great work!"
+msgstr "축하합니다! %(pos)d위에 올랐습니다! 계속 힘내세요!"
+
+#: itemConstants.py
+msgid "Destruction"
+msgstr "파괴"
+
+#: ssAppMain.py:874
+msgid "Do you want to post this score to the scoreboard?"
+msgstr "이 점수를 스코어보드에 등록할까요?"
+
+#: ssAppMain.py:1036
+msgid "Download job has ended! Press enter to close the application."
+msgstr "다운로드가 끝났습니다! 엔터를 눌러 게임을 종료하세요."
+
+#: ssAppMain.py:335
+#, python-format
+msgid "Downloading the new version (%(current)dK/%(total)dK (%(percent)d%%)"
+msgstr "새 버전을 내려받는 중입니다 (%(current)dK/%(total)dK, %(percent)d%%)"
+
+#: gameField.py:499
+msgid "End destruction!"
+msgstr "파괴 종료!"
+
+#: ssAppMain.py:289
+msgid "Erase data"
+msgstr "데이터 지우기"
+
+#: itemEffects.py:221
+#, python-format
+msgid "Every point you gain is now multiplied by %(multiplier)d!"
+msgstr "이제 얻는 모든 점수가 %(multiplier)d배가 됩니다!"
+
+#: itemConstants.py
+msgid "Extra life"
+msgstr "생명 추가"
+
+#: gameField.py:331 player.py:267
+#, python-format
+msgid "Extra life! (now %(lives)d lives)"
+msgstr "생명 추가! (현재 생명 %(lives)d개)"
+
+#: ssAppMain.py:343
+#, python-format
+msgid "Failed to download the new update (%(reason)s). Press enter to retry."
+msgstr "새 업데이트를 내려받지 못했습니다 (%(reason)s). 엔터를 눌러 다시 시도하세요."
+
+#: ssAppMain.py:840
+#, python-format
+msgid "Final score: %(score)d"
+msgstr "최종 점수: %(score)d"
+
+#: ssAppMain.py:1028
+msgid "Forcefully shutdown"
+msgstr "강제 종료"
+
+#: gameField.py:309
+#, python-format
+msgid "Forcibly ended all item effects (%(items)s)!"
+msgstr "모든 아이템 효과를 강제로 종료했습니다 (%(items)s)!"
+
+#: gameField.py:465
+msgid "Game aborted."
+msgstr "게임을 중단했습니다."
+
+#: player.py:390
+msgid "Game over!"
+msgstr "게임 오버!"
+
+#: gameField.py:113
+#, python-format
+msgid "Game over! Final score: %(score)d"
+msgstr "게임 오버! 최종 점수: %(score)d"
+
+#: ssAppMain.py:766
+msgid "Game paused"
+msgstr "게임 일시정지"
+
+#: ssAppMain.py:839
+msgid "Game result"
+msgstr "게임 결과"
+
+#: gameField.py:35
+#, python-format
+msgid "Game started at %(startedtime)s!"
+msgstr "%(startedtime)s에 게임을 시작했습니다!"
+
+#: gameModes.py:308
+#, python-format
+msgid "Highest boost: %(boost)sx"
+msgstr "최고 배율: %(boost)s배"
+
+#: ssAppMain.py:546
+msgid "Highscores"
+msgstr "최고 점수"
+
+#: gameModes.py:226
+#, python-format
+msgid "Hit! (speed %(speed)d, burden %(burden)d, %(boost)sx boost)"
+msgstr "명중! (속도 %(speed)d, 부담 %(burden)d, %(boost)s배 보너스)"
+
+#: gameModes.py:60
+#, python-format
+msgid "Hit! (speed %(speed)d, distance %(distance)d)"
+msgstr "명중! (속도 %(speed)d, 거리 %(distance)d)"
+
+#: gameModes.py:58
+#, python-format
+msgid "Hit! (speed %(speed)d, distance %(distance)d, penetration bonus added)"
+msgstr "명중! (속도 %(speed)d, 거리 %(distance)d, 관통 보너스 추가)"
+
+#: ssAppMain.py:556
+msgid "Hold shift and enter to erase."
+msgstr "쉬프트를 누른 채 엔터를 누르면 지워집니다."
+
+#: gameField.py:378
+msgid "How many stored destructions should you have?"
+msgstr "저장된 파괴를 몇 개로 설정할까요?"
+
+#: gameField.py:522
+msgid "How many times should destruction repeat (every 0.5 seconds)?"
+msgstr "파괴를 몇 번 반복할까요? (0.5초마다)"
+
+#: ssAppMain.py:581
+msgid "Item announcement voice"
+msgstr "아이템 안내 음성"
+
+#: ssAppMain.py:582
+msgid "Language (restart to apply)"
+msgstr "언어 (다시 시작해야 적용됩니다)"
+
+#: ssAppMain.py:579
+msgid "Left panning limit"
+msgstr "왼쪽 팬 한계"
+
+#: ssAppMain.py:775
+#, python-format
+msgid "Level: %(level)d, player HP: %(hp)d."
+msgstr "레벨: %(level)d, 남은 생명: %(hp)d."
+
+#: gameField.py:423
+#, python-format
+msgid "Leveled up to %(newlevel)d! (Accuracy %(accuracy).1f%%, with %(lives)d hp remaining)"
+msgstr "레벨 %(newlevel)d로 올라갔습니다! (정확도 %(accuracy).1f%%, 남은 생명 %(lives)d)"
+
+#: collection.py:275
+msgid "Locked"
+msgstr "잠김"
+
+#: ssAppMain.py:283
+msgid "Main menu. Use your up and down arrows to choose an option, then press enter to confirm"
+msgstr "메인 메뉴입니다. 위아래 화살표로 항목을 고르고 엔터로 확인하세요"
+
+#: itemConstants.py
+msgid "Megaton punch"
+msgstr "메가톤 펀치"
+
+#: ssAppMain.py:877
+msgid "Name entry"
+msgstr "이름 입력"
+
+#: ssAppMain.py:842
+#, python-format
+msgid "New high score! Plus %(distance)d (last: %(last)d)"
+msgstr "신기록입니다! %(distance)d점 앞섰습니다 (이전 기록: %(last)d)"
+
+#: ssAppMain.py:969
+msgid "No"
+msgstr "아니오"
+
+#: collection.py:277
+#, python-format
+msgid "No.%(no)d, %(status)s, %(plays)d"
+msgstr "%(no)d번, %(status)s, %(plays)d"
+
+#: ssAppMain.py:271
+msgid "Normal mode"
+msgstr "노멀 모드"
+
+#: item.py:70
+#, python-format
+msgid "Obtained a \"%(item)s\" item!"
+msgstr "\"%(item)s\" 아이템을 획득했습니다!"
+
+#: itemEffects.py:44
+#, python-format
+msgid "One of your \"%(item)s\" effects is ending!"
+msgstr "\"%(item)s\" 효과 하나가 끝납니다!"
+
+#: ssAppMain.py:290
+msgid "Options"
+msgstr "설정"
+
+#: ssAppMain.py:576
+msgid "Options Menu, use your up and down arrows to choose an option, left and right arrows to change values, enter to save or escape to discard changes"
+msgstr "설정 메뉴입니다. 위아래 화살표로 항목을 고르고, 좌우 화살표로 값을 바꾸며, 엔터로 저장하거나 이스케이프로 변경을 취소하세요"
+
+#: itemConstants.py
+msgid "Penetration"
+msgstr "관통"
+
+#: gameField.py:82
+#, python-format
+msgid "Playing: %(mode)s, high score: %(highscore)d."
+msgstr "플레이 중: %(mode)s, 최고 점수: %(highscore)d."
+
+#: ssAppMain.py:876 ssAppMain.py:877
+msgid "Please input your name."
+msgstr "이름을 입력하세요."
+
+#: ssAppMain.py:480
+msgid "Please select the game mode to view"
+msgstr "확인할 게임 모드를 선택하세요"
+
+#: player.py:416
+#, python-format
+msgid "Point: %(added).1f %(changestr)s (%(total).1f)"
+msgstr "점수: %(added).1f점 %(changestr)s (합계 %(total).1f)"
+
+#: ssAppMain.py:767
+msgid "Press enter or escape to resume. Use your up and down arrows to view current stats."
+msgstr "엔터나 이스케이프를 누르면 계속합니다. 위아래 화살표로 현재 상태를 확인하세요."
+
+#: ssAppMain.py:772 ssAppMain.py:847
+#, python-format
+msgid "Punches: %(punches)d, hits: %(hits)d, accuracy: %(accuracy).2f%%"
+msgstr "펀치: %(punches)d회, 명중: %(hits)d회, 정확도: %(accuracy).2f%%"
+
+#: ssAppMain.py:291
+msgid "Quit"
+msgstr "종료"
+
+#: ssAppMain.py:288
+msgid "Read the manual"
+msgstr "설명서 읽기"
+
+#: gameField.py:299
+#, python-format
+msgid "Removed all nasty item effects (%(items)s)!"
+msgstr "나쁜 아이템 효과를 모두 제거했습니다 (%(items)s)!"
+
+#: gameField.py:522
+msgid "Repeat destruction"
+msgstr "파괴 반복"
+
+#: itemConstants.py
+msgid "Reset enemies"
+msgstr "적 초기화"
+
+#: gameField.py:289
+#, python-format
+msgid "Restored the original time of %(count)d good effect(s)."
+msgstr "좋은 효과 %(count)d개의 시간을 원래대로 되돌렸습니다."
+
+#: itemConstants.py
+msgid "Rewind"
+msgstr "되감기"
+
+#: ssAppMain.py:580
+msgid "Right panning limit."
+msgstr "오른쪽 팬 한계"
+
+#: itemConstants.py
+msgid "Score multiplier"
+msgstr "점수 배율"
+
+#: player.py:406
+#, python-format
+msgid "Score multiplier x%(multiplier)d! %(fromscore).1f points became %(toscore).1f points."
+msgstr "점수 %(multiplier)d배! %(fromscore).1f점이 %(toscore).1f점이 되었습니다."
+
+#: ssAppMain.py:874
+msgid "Score posting"
+msgstr "점수 등록"
+
+#: ssAppMain.py:501
+#, python-format
+msgid "Score table for %(mode)s"
+msgstr "%(mode)s 스코어보드"
+
+#: ssAppMain.py:768
+#, python-format
+msgid "Score: %(score)d"
+msgstr "점수: %(score)d"
+
+#: ssAppMain.py:546
+msgid "Select the data to erase"
+msgstr "지울 데이터를 선택하세요"
+
+#: ssAppMain.py:397 ssAppMain.py:398
+msgid "Select the folder where you want to download the installer."
+msgstr "설치 파일을 내려받을 폴더를 선택하세요."
+
+#: ssAppMain.py:602
+msgid "Settings saved"
+msgstr "설정을 저장했습니다"
+
+#: itemConstants.py
+msgid "Shrink"
+msgstr "축소"
+
+#: itemConstants.py
+msgid "Slow down"
+msgstr "감속"
+
+#: ssAppMain.py:578
+msgid "Sound effects volume"
+msgstr "효과음 음량"
+
+#: gameField.py:378
+msgid "Stored destruction"
+msgstr "저장된 파괴"
+
+#: gameField.py:370
+#, python-format
+msgid "Stored destruction count is now %(r)d!"
+msgstr "저장된 파괴 개수를 %(r)d개로 설정했습니다!"
+
+#: ssAppMain.py:1081
+#, python-format
+msgid "The changelog file written in the selected language doesn't seem to exist. If you can write one and contribute, please create %(filename)s and contact the developer."
+msgstr "선택한 언어로 된 변경 내역 파일이 없습니다. 직접 작성해 기여하고 싶다면 %(filename)s 파일을 만들어 개발자에게 알려 주세요."
+
+#: player.py:330
+#, python-format
+msgid "The effective range of your Punch is now %(range)d (from %(from)d)"
+msgstr "펀치의 유효 사거리가 %(range)d이(가) 되었습니다 (%(from)d에서)"
+
+#: ssAppMain.py:777
+#, python-format
+msgid "The game is being fast forwarded by a rewind effect (%(pitch)d%% speed)."
+msgstr "되감기 효과로 게임이 빨리 감기 중입니다 (속도 %(pitch)d%%)."
+
+#: itemEffects.py:248
+msgid "The game is being fast forwarded! The music, every sound and the time itself are speeding up!"
+msgstr "게임이 빨리 감기 시작합니다! 음악, 모든 소리, 게임 속도까지 전부 빨라집니다!"
+
+#: ssAppMain.py:520
+#, python-format
+msgid "The manual written in the selected language doesn't seem to exist. If you can write one and contribute, please create %(filename)s and contact the developer."
+msgstr "선택한 언어로 된 설명서가 없습니다. 직접 작성해 기여하고 싶다면 %(filename)s 파일을 만들어 개발자에게 알려 주세요."
+
+#: ssAppMain.py:341
+#, python-format
+msgid "The new version has been downloaded to %(location)s."
+msgstr "새 버전을 %(location)s에 내려받았습니다."
+
+#: gameField.py:363
+msgid "The number of enemies has been reset to one!"
+msgstr "적의 수가 하나로 초기화되었습니다!"
+
+#: itemEffects.py:95
+#, python-format
+msgid "The remaining time of your \"%(item)s\" effect has been multiplied by %(multiplier)d! (now %(sec).2f seconds)"
+msgstr "\"%(item)s\" 효과의 남은 시간이 %(multiplier)d배가 되었습니다! (현재 %(sec).2f초)"
+
+#: gameField.py:282
+#, python-format
+msgid "The remaining time of your \"%(item)s\" effect has been restored! (now %(sec).2f seconds)"
+msgstr "\"%(item)s\" 효과의 남은 시간을 원래대로 되돌렸습니다! (현재 %(sec).2f초)"
+
+#: player.py:341
+#, python-format
+msgid "The speed of your punch is now %(speed)d milliseconds (from %(from)d)"
+msgstr "펀치 속도가 %(speed)d밀리초가 되었습니다 (%(from)d에서)"
+
+#: gameField.py:269
+#, python-format
+msgid "The time of %(count)d good effect(s) has been multiplied by %(multiplier)d! Press Shift+V to restore it."
+msgstr "좋은 효과 %(count)d개의 시간이 %(multiplier)d배가 되었습니다! 쉬프트+V를 누르면 원래대로 되돌립니다."
+
+#: gameField.py:307
+msgid "There are no effects to end!"
+msgstr "종료할 효과가 없습니다!"
+
+#: gameField.py:244
+msgid "There are no falling items to collect!"
+msgstr "획득할 떨어지는 아이템이 없습니다!"
+
+#: gameField.py:231
+msgid "There are no falling items to throw away!"
+msgstr "버릴 떨어지는 아이템이 없습니다!"
+
+#: gameField.py:287
+msgid "There are no good effect times to restore!"
+msgstr "되돌릴 좋은 효과 시간이 없습니다!"
+
+#: gameField.py:267
+msgid "There are no good effects to extend!"
+msgstr "늘릴 좋은 효과가 없습니다!"
+
+#: gameField.py:297
+msgid "There are no nasty effects to remove!"
+msgstr "제거할 나쁜 효과가 없습니다!"
+
+#: ssAppMain.py:322
+msgid "There is a new version of the game! Press enter here to download it."
+msgstr "새 버전이 나왔습니다! 여기서 엔터를 눌러 내려받으세요."
+
+#: ssAppMain.py:890
+#, python-format
+msgid "There was an error while posting your score (%(error)s). Please try again later."
+msgstr "점수를 등록하는 중 오류가 발생했습니다 (%(error)s). 나중에 다시 시도해 주세요."
+
+#: ssAppMain.py:316
+#, python-format
+msgid "There was an error while retrieving software update information (%(error)s). Please try again later."
+msgstr "업데이트 정보를 가져오는 중 오류가 발생했습니다 (%(error)s). 나중에 다시 시도해 주세요."
+
+#: ssAppMain.py:886
+#, python-format
+msgid "This build of %(gamename)s does not support score posting. Sorry!"
+msgstr "이 %(gamename)s 빌드는 점수 등록을 지원하지 않습니다. 죄송합니다!"
+
+#: ssAppMain.py:498
+#, python-format
+msgid "This build of %(gamename)s does not support scoreboard viewing."
+msgstr "이 %(gamename)s 빌드는 스코어보드 보기를 지원하지 않습니다."
+
+#: ssAppMain.py:394
+#, python-format
+msgid "This build of %(gamename)s doesn't have download location set."
+msgstr "이 %(gamename)s 빌드는 내려받을 위치가 설정되어 있지 않습니다."
+
+#: player.py:263
+#, python-format
+msgid "This effect will be used when it's necessary! (Remaining %(r)d)"
+msgstr "이 효과는 필요할 때 사용됩니다! (남은 개수 %(r)d)"
+
+#: ssAppMain.py:774
+#, python-format
+msgid "This game is currently lasting for %(time)s."
+msgstr "이 게임은 지금까지 %(time)s 동안 진행 중입니다."
+
+#: ssAppMain.py:853
+#, python-format
+msgid "This game lasted for %(time)s."
+msgstr "이번 게임은 %(time)s 동안 진행되었습니다."
+
+#: ssAppMain.py:458
+#, python-format
+msgid "This is the new arcade mode of %(gamename)s! From the new version, items that fall faster are more likely to be good, and slower ones are more likely to be bad. You can obtain an item by punching it, or destroy it by combining your up arrow when punching. Carefully choose which item to obtain!"
+msgstr "%(gamename)s의 새로운 아케이드 모드입니다! 이번 버전부터는 빨리 떨어지는 아이템일수록 좋은 효과일 확률이 높고, 느린 아이템일수록 나쁜 효과일 확률이 높습니다. 아이템을 펀치하면 획득하고, 위 화살표를 누른 채 펀치하면 파괴합니다. 어떤 아이템을 얻을지 신중하게 고르세요!"
+
+#: ssAppMain.py:454
+#, python-format
+msgid "This is the new standard mode of %(gamename)s. Use your left and right arrows to move to the same position as an enemy and spacebar to punch! But remember, they need to be close enough to be hit by your fist. Compared to the previous version, you get bonus points when leveling up. Also, you have chances to get bonuses if you achieve more than 5 consecutive hits!"
+msgstr "%(gamename)s의 새로운 기본 모드입니다. 좌우 화살표로 적과 같은 위치로 이동하고 스페이스바로 펀치하세요! 단, 주먹이 닿을 만큼 가까이 와야 맞출 수 있습니다. 이전 버전과 달리 레벨이 오르면 보너스 점수를 받고, 5연속 명중 이상을 달성하면 보너스를 받을 수 있습니다!"
+
+#: ssAppMain.py:461
+msgid "This is the old-fashioned game mode! You don't get bonuses based on accuracy, so you can punch, punch, punch punch punch and punch! This mode has a sharper levelup curb, meaning that you can collect screams really fast!"
+msgstr "옛날식 게임 모드입니다! 정확도에 따른 보너스가 없으니 그저 펀치, 펀치, 펀치펀치펀치, 펀치! 레벨업 곡선이 더 가파르기 때문에 비명을 아주 빨리 모을 수 있습니다!"
+
+#: gameField.py:236
+#, python-format
+msgid "Threw away %(count)d falling item(s)! (good and nasty)"
+msgstr "떨어지던 아이템 %(count)d개를 버렸습니다! (좋은 것과 나쁜 것 모두)"
+
+#: ssAppMain.py:471
+#, python-format
+msgid "Tip: %s (Press enter to close this tip)"
+msgstr "힌트: %s (엔터를 누르면 이 힌트를 닫습니다)"
+
+#: collection.py:272
+msgid "Unlocked"
+msgstr "해금됨"
+
+#: ssAppMain.py:820
+#, python-format
+msgid "Unlocked %(number)d %(collection)s!"
+msgstr "%(number)d번째 %(collection)s 해금!"
+
+#: ssAppMain.py:314
+#, python-format
+msgid "Update checking is disabled in this build of %(gamename)s."
+msgstr "이 %(gamename)s 빌드에서는 업데이트 확인이 비활성화되어 있습니다."
+
+#: ssAppMain.py:1026
+msgid "Update downloading is still in progress"
+msgstr "업데이트 다운로드가 아직 진행 중입니다"
+
+#: collection.py:216
+msgid "Use your left and right arrows to brows your collections, then press enter to make your unlocked one scream. You can move through your unlocked items with shift + left or right. To play with pitch changing, hold down up and down arrows. Press escape when you're satisfied."
+msgstr "좌우 화살표로 수집품을 넘겨 보고, 엔터를 누르면 해금된 수집품이 비명을 지릅니다. 쉬프트+좌우 화살표로 해금된 항목 사이를 이동합니다. 위아래 화살표를 누르고 있으면 피치를 바꿔 재생합니다. 만족하면 이스케이프를 누르세요."
+
+#: ssAppMain.py:526
+msgid "Use your up and down arrows to read the manual. You can navigate to each section by using shortcut keys 1 to 9. Press escape to close"
+msgstr "위아래 화살표로 설명서를 읽습니다. 숫자 1부터 9까지의 단축키로 각 부분으로 이동할 수 있습니다. 이스케이프를 누르면 닫힙니다"
+
+#: ssAppMain.py:287
+msgid "View the scoreboard"
+msgstr "스코어보드 보기"
+
+#: ssAppMain.py:404
+msgid "Warning"
+msgstr "경고"
+
+#: ssAppMain.py:463
+msgid "Welcome to this new and exciting burden mode! In this mode, every item gives you a nasty effect, and each nasty effect boosts points you gain! Guess what? The more you torture yourself, the more point boost you get! Oh, but if you die because of your own torturous act, hahahahahaha, you stupid! Good luck!"
+msgstr "새롭고 짜릿한 버든 모드에 오신 것을 환영합니다! 이 모드에서는 모든 아이템이 나쁜 효과를 주고, 나쁜 효과 하나하나가 획득 점수를 높여 줍니다! 그렇습니다. 자신을 더 괴롭힐수록 더 많은 점수를 얻습니다! 아, 하지만 스스로 괴롭히다가 죽는다면, 하하하하하하, 바보! 행운을 빕니다!"
+
+#: ssAppMain.py:968
+msgid "Yes"
+msgstr "예"
+
+#: ssAppMain.py:770
+#, python-format
+msgid "You are updating your high score. Currently plus %(distance)d (last: %(last)d)"
+msgstr "최고 점수를 갱신 중입니다. 현재 %(distance)d점 앞서 있습니다 (이전 기록: %(last)d)"
+
+#: ssAppMain.py:781
+#, python-format
+msgid "You have %(amount)d stored destructions. You will be protected automatically instead of consuming these."
+msgstr "저장된 파괴가 %(amount)d개 있습니다. 이 효과를 소모하는 대신 자동으로 보호됩니다."
+
+#: ssAppMain.py:854
+#, python-format
+msgid "You reached level %(level)d."
+msgstr "레벨 %(level)d에 도달했습니다."
+
+#: player.py:378
+msgid "You're about to be attacked, but you have a counter!"
+msgstr "공격당할 위기지만 반격할 수단이 있습니다!"
+
+#: ssAppMain.py:319
+msgid "You're playing the latest version! When a new update is found, you will be notified here."
+msgstr "최신 버전을 사용 중입니다! 새 업데이트가 나오면 여기에서 알려 드립니다."
+
+#: player.py:384
+#, python-format
+msgid "You've been slapped! (%(lives)d HP remaining)"
+msgstr "공격을 받았습니다! (남은 생명 %(lives)d)"
+
+#: itemEffects.py:52
+#, python-format
+msgid "Your \"%(item)s\" effect has been extended for %(extended)d milliseconds! (now %(newtime)d)"
+msgstr "\"%(item)s\" 효과가 %(extended)d밀리초 연장되었습니다! (현재 %(newtime)d)"
+
+#: ssAppMain.py:565
+msgid "Your collections are all reset!"
+msgstr "수집품이 모두 초기화되었습니다!"
+
+#: ssAppMain.py:561
+msgid "Your highscores are all reset!"
+msgstr "최고 점수가 모두 초기화되었습니다!"
+
+#: player.py:354
+msgid "Your punches no longer penetrate enemies and items!"
+msgstr "이제 펀치가 적과 아이템을 관통하지 않습니다!"
+
+#: player.py:352
+msgid "Your punches now penetrate enemies and items!"
+msgstr "이제 펀치가 적과 아이템을 관통합니다!"
+
+#: ssAppMain.py:895
+msgid "Your score was posted, but you were not ranked in. Better luck next time!"
+msgstr "점수가 등록되었지만 순위에 들지 못했습니다. 다음 기회에 힘내세요!"
+
+#: player.py:413
+msgid "added"
+msgstr "추가"
+
+#: ssAppMain.py:819
+msgid "collection"
+msgstr "수집품"
+
+#: ssAppMain.py:819
+msgid "collections"
+msgstr "수집품"
+
+#: gameResult.py:37
+msgid "minute"
+msgstr "분"
+
+#: gameResult.py:37
+msgid "minutes"
+msgstr "분"
+
+#: gameResult.py:38
+msgid "second"
+msgstr "초"
+
+#: gameResult.py:38
+msgid "seconds"
+msgstr "초"
+
+#: player.py:415
+msgid "subtracted"
+msgstr "감소"
+
