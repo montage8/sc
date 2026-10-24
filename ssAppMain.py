@@ -512,18 +512,92 @@ class ssAppMain(window.SingletonWindow):
         # end while the mode selection menu is active
     # end viewScoreboard
 
+    def getResourceDirs(self):
+        """
+        Returns the directories in which the public text files (the manual and
+        the changelog) may be located.
+
+        When the game is run from a built package, those files sit next to the
+        executable, which is the current working directory. When it is run from
+        the source tree, they are still inside the "public" folder. The mac app
+        bundle keeps everything under its resources directory.
+
+        :rtype: list
+        """
+        dirs = ["."]
+        candidates = ["public"]
+        try:
+            embedded = platform_utils.paths.embedded_data_path()
+        except Exception:
+            embedded = None
+        if embedded:
+            candidates.append(os.path.join(embedded, "public"))
+            candidates.append(embedded)
+        for elem in candidates:
+            if elem not in dirs:
+                dirs.append(elem)
+        # end for
+        return dirs
+    # end getResourceDirs
+
+    def findTextResource(self, prefix):
+        """
+        Searches for a localised text file such as "readme_ko.txt" and returns
+        its path together with the language code which was actually found.
+
+        The language code is matched leniently, because locale names and file
+        names do not always agree: "ko_KR" ends up as "readme_ko.txt",
+        "v_VN" as "readme_vn.txt", and some files are capitalised
+        ("Readme_Tr.txt"). If nothing matches the selected language, the English
+        file is used instead.
+
+        :param prefix: File name prefix, "readme" or "changelog".
+        :type prefix: str
+
+        :rtype: (str, str) or (None, None)
+        """
+        available = {}
+        for directory in self.getResourceDirs():
+            try:
+                names = os.listdir(directory)
+            except OSError:
+                continue
+            # end try
+            for name in names:
+                lowered = name.lower()
+                if lowered.startswith(prefix + "_") and lowered.endswith(".txt"):
+                    available.setdefault(lowered, os.path.join(directory, name))
+            # end for
+        # end for
+        language = (self.options.language or "en_US").lower()
+        codes = [language, language.replace("_", "")]
+        if "_" in language:
+            codes.append(language.split("_")[1])
+        codes.append(language[0:2])
+        codes.append("en")
+        for code in codes:
+            name = "%s_%s.txt" % (prefix, code)
+            if name in available:
+                return available[name], code
+        # end for
+        return None, None
+    # end findTextResource
+
     def displayManual(self):
         """Shows the manual reading dialog. Returns when user presses escape."""
-        fname = "readme_" + self.options.language[0:2] + ".txt"
-        if not os.path.isfile(fname):
+        fname, code = self.findTextResource("readme")
+        if fname is None:
             self.message(
                 _("The manual written in the selected language doesn't seem to exist. If you can write one and contribute, please create %(filename)s and contact the developer.") % {
-                    "filename": fname})
+                    "filename": "readme_" + self.options.language[0:2] + ".txt"})
             return
         # end not exist
+        title = _("Use your up and down arrows to read the manual. You can navigate to each section by using shortcut keys 1 to 9. Press escape to close")
+        if code == "en" and not self.options.language.lower().startswith("en"):
+            title = _("The manual is not available in the selected language, so the English manual is shown.") + " " + title
+        # end fallback
         f = open(fname, "r", encoding="UTF-8")
-        m = self.createMenu(
-            _("Use your up and down arrows to read the manual. You can navigate to each section by using shortcut keys 1 to 9. Press escape to close"))
+        m = self.createMenu(title)
         for line in f:
             if line != "\n":
                 m.append(line.rstrip())
@@ -1103,15 +1177,19 @@ Returns False when the game is closed. Otherwise True.
 
     def showChangeLog(self):
         """Shows the changelog."""
-        fname = "changelog_" + self.options.language[0:2] + ".txt"
-        if not os.path.isfile(fname):
+        fname, code = self.findTextResource("changelog")
+        if fname is None:
             self.message(
                 _("The changelog file written in the selected language doesn't seem to exist. If you can write one and contribute, please create %(filename)s and contact the developer.") % {
-                    "filename": fname})
+                    "filename": "changelog_" + self.options.language[0:2] + ".txt"})
             return
         # end not exist
+        title = _("Changelog")
+        if code == "en" and not self.options.language.lower().startswith("en"):
+            title = _("The changelog is not available in the selected language, so the English changelog is shown.") + " " + title
+        # end fallback
         f = open(fname, "r", encoding="UTF-8")
-        m = self.createMenu(_("Changelog"))
+        m = self.createMenu(title)
         for line in f:
             if line != "\n":
                 m.append(line.rstrip())
