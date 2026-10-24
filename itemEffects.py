@@ -8,6 +8,7 @@ import random
 
 import globalVars
 import itemConstants
+import rewind
 import window
 
 
@@ -219,3 +220,33 @@ class ScoreMultiplierEffect(ItemEffectBase):
         super().activate(mode)
         self.player.field.log(_("Every point you gain is now multiplied by %(multiplier)d!") %
                               {"multiplier": self.scoreMultiplier})
+
+
+class RewindEffect(ItemEffectBase):
+    """Rewind (fast-forward) effect.
+
+    This is a nasty effect. While it is active, not only the music but the
+    whole game is fast forwarded: the in-game time itself flows faster, and
+    every sound (the enemies, the falling items, the sound effects and so on)
+    is pitched up along with it, so everything happens and sounds accelerated
+    at once.
+
+    The pitch climbs for about 3 seconds at exactly the same rate as the music
+    pitch descends when a game ends, holds there while the effect lasts, and
+    glides back down at the same rate when it ends. The acceleration itself is
+    driven by rewind.RewindController, since it is shared by every active
+    rewind effect and by the entire game.
+    """
+
+    def initialize(self, player):
+        super().initialize(player, globalVars.appMain.sounds["boost.ogg"], globalVars.appMain.sounds["boostFade.ogg"],
+                           itemConstants.NAMES[itemConstants.TYPE_NASTY][itemConstants.NASTY_REWIND], itemConstants.TYPE_NASTY)
+
+    def activate(self, mode):
+        super().activate(mode)
+        rewind.getController().requestAcceleration()
+        self.player.field.log(_("The game is being fast forwarded! The music, every sound and the time itself are speeding up!"))
+
+    def deactivate(self, mode):
+        super().deactivate(mode)
+        rewind.getController().releaseAcceleration()

@@ -186,6 +186,12 @@ class Player():
             e.activate(self.field.modeHandler)
             self.itemEffects.append(e)
             return
+        if it.identifier == itemConstants.NASTY_REWIND:
+            e = itemEffects.RewindEffect()
+            e.initialize(self)
+            e.activate(self.field.modeHandler)
+            self.itemEffects.append(e)
+            return
 
     def processShrinkItemEffect(self):
         """

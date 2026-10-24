@@ -5,6 +5,7 @@
 # License: GPL V2.0 (See copying.txt for details)
 
 import math
+import weakref
 import sound_lib
 import sound_lib.output
 import sound_lib.sample
@@ -13,6 +14,44 @@ from sound_lib.external.pybass import BASS_SetConfig, BASS_CONFIG_GVOL_SAMPLE
 from sound_lib.main import BassError
 from dialog import dialog
 o = sound_lib.output.Output()
+
+# Global pitch scale (1.0 means "exactly as recorded"). Every sound multiplies
+# the pitch it is given by this value, and every sound which is currently alive
+# is re-pitched immediately when the scale changes. This makes it possible to
+# speed up (or slow down) the whole game's audio at once -- the background
+# music, the enemies, the items and every other sound effect alike. It is
+# driven by rewind.py for the "Rewind" nasty item.
+_pitchScale = 1.0
+_liveSounds = weakref.WeakSet()
+
+
+def getGlobalPitchScale():
+    """Returns the pitch scale which is currently applied to every sound.
+
+    :rtype: float
+    """
+    return _pitchScale
+# end getGlobalPitchScale
+
+
+def setGlobalPitchScale(scale):
+    """Sets the pitch scale which is applied to every sound. Sounds that are
+    already playing are re-pitched right away, so the change is heard
+    instantly instead of only affecting the sounds which are played later.
+
+    :param scale: New scale. 1.0 means the normal (as recorded) pitch.
+    :type scale: float
+    """
+    global _pitchScale
+    if scale < 0.01:
+        scale = 0.01
+    if scale == _pitchScale:
+        return
+    _pitchScale = scale
+    for elem in list(_liveSounds):
+        elem.applyGlobalPitchScale()
+    # end for
+# end setGlobalPitchScale
 
 
 def setGlobalSfxVolume(value):
@@ -33,6 +72,11 @@ class sound():
         self.handle = None
         self.freq = 44100
         self.paused = False
+        # The pitch which the caller asked for, in percent, before the global
+        # pitch scale is applied. It is remembered so that the audible pitch
+        # can be recomputed whenever the global scale changes.
+        self.logicalPitch = 100
+        _liveSounds.add(self)
 
     def stream(self, filename=""):
         if self.handle:
@@ -40,6 +84,7 @@ class sound():
 # end close previous
         self.handle = stream.FileStream(file=filename)
         self.freq = self.handle.get_frequency()
+        self.applyGlobalPitchScale()
 
     def load(self, sample=None):
         if self.handle:
@@ -54,6 +99,7 @@ class sound():
             self.handle = None
             return
         self.freq = self.handle.get_frequency()
+        self.applyGlobalPitchScale()
 
     def play(self):
         if not self.handle:
@@ -110,14 +156,27 @@ class sound():
 
     @property
     def pitch(self):
-        if not self.handle:
-            return False
-        return (self.handle.get_frequency() / self.freq) * 100
+        """The pitch which was assigned to this sound, in percent, without the
+        global pitch scale. The pitch which can actually be heard is this value
+        multiplied by the global scale (see setGlobalPitchScale)."""
+        return self.logicalPitch
 
     @pitch.setter
     def pitch(self, value):
+        self.logicalPitch = value
+        self.applyGlobalPitchScale()
+
+    def applyGlobalPitchScale(self):
+        """(Re)applies this sound's pitch, scaled by the global pitch scale, to
+        the playback frequency. Called when a pitch is assigned, when a new
+        sample or stream is loaded, and whenever the global scale changes."""
         if not self.handle:
             return False
+        value = self.logicalPitch * _pitchScale
+        if value == 100:
+            # Neither the caller nor the global scale changed anything, so the
+            # channel's own (native) frequency is already the right one.
+            return
         if value < 1:
             value = 1
         # No upper ceiling is enforced here; callers are responsible for
@@ -129,6 +188,7 @@ class sound():
             # Keep the previous (highest achievable) frequency rather than
             # crashing, so the pitch can keep climbing as far as possible.
             pass
+    # end applyGlobalPitchScale
 
     @property
     def pan(self):

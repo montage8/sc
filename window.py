@@ -125,17 +125,43 @@ class SingletonWindow():
 
 
 class Timer:
-    """A simple timer class like bgt."""
+    """A simple timer class like bgt.
 
-    def __init__(self):
+    Timers measure the in-game time. The whole game can be accelerated (or
+    slowed down) at once by changing the class-level ``timeScale``: while it is
+    not 1.0, ``elapsed`` grows that many times faster than the real time, so
+    every timer-driven behavior (enemies walking, items falling, item effects
+    expiring and so on) is sped up together. It is driven by rewind.py for the
+    "Rewind" nasty item.
+
+    A timer created with ``scaled=False`` always measures the real time and is
+    therefore immune to the scale. Such timers are used to drive the scale
+    change itself, which would otherwise feed back into its own speed.
+    """
+
+    timeScale = 1.0
+
+    def __init__(self, scaled=True):
+        self.scaled = scaled
         self.paused = False
-        self.pausedElapsed = 0
         self.restart()
+
+    @classmethod
+    def setTimeScale(cls, scale):
+        """Sets the in-game time scale which is applied to every scaled timer.
+
+        :param scale: New scale. 1.0 means the real time.
+        :type scale: float
+        """
+        if scale < 0.01:
+            scale = 0.01
+        cls.timeScale = scale
+    # end setTimeScale
 
     def restart(self):
         """Restarts this timer."""
-        self.pausedElapsed = 0
-        self.startTick = pygame.time.get_ticks()
+        self.accumulated = 0.0
+        self.lastTick = pygame.time.get_ticks()
 
     @property
     def elapsed(self):
@@ -145,16 +171,26 @@ class Timer:
         :rtype: int
         """
         if self.paused:
-            return self.pausedElapsed
-        return self.pausedElapsed + pygame.time.get_ticks() - self.startTick
+            return int(self.accumulated)
+        self.accumulate()
+        return int(self.accumulated)
+
+    def accumulate(self):
+        """Adds the time which has passed since this timer was last updated to
+        its elapsed time, multiplied by the current in-game time scale.
+        Internally called."""
+        now = pygame.time.get_ticks()
+        self.accumulated += (now - self.lastTick) * (Timer.timeScale if self.scaled else 1.0)
+        self.lastTick = now
+    # end accumulate
 
     def setPaused(self, p):
         if p == self.paused:
             return
         if p:
-            self.pausedElapsed = self.elapsed
+            self.accumulate()
         else:
-            self.startTick = pygame.time.get_ticks()
+            self.lastTick = pygame.time.get_ticks()
         # end paused or unpaused
         self.paused = p
     # end setPaused

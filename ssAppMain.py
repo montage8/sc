@@ -22,6 +22,7 @@ import gameOptions
 import gameResult
 import globalVars
 import itemVoicePlayer
+import rewind
 import scorePostingAdapter
 import scoreViewAdapter
 import stats
@@ -212,9 +213,15 @@ class ssAppMain(window.SingletonWindow):
             self.playRandomMusic()
 
     def frameUpdate(self):
-        """Extends the base per-frame update to also advance the background
-        music playlist (starting the next random track when one ends)."""
+        """Extends the base per-frame update to also glide the rewind
+        (fast-forward) pitch and advance the background music playlist
+        (starting the next random track when one ends).
+
+        The rewind glide is driven here rather than from the game field so that
+        it keeps gliding back down to the normal pitch while the game over
+        sequence and the result screen are being played."""
         super().frameUpdate()
+        rewind.getController().frameUpdate()
         self.updateMusic()
 
     def createMenu(self, title, default=None):
@@ -318,6 +325,9 @@ class ssAppMain(window.SingletonWindow):
             return
         self.checkChangeLog()
         while(True):
+            # Safety net: the fast-forward state of a finished game must never
+            # leak into the menus.
+            rewind.getController().reset()
             selected = self.mainmenu()
             if selected is False or selected == 10:
                 self.exit()
@@ -681,6 +691,9 @@ class ssAppMain(window.SingletonWindow):
 
         :rtype: gameResult.GameResult
         """
+        # Every game starts at the normal pitch and speed, no matter how the
+        # previous one ended.
+        rewind.getController().reset()
         self.say(_("%(playmode)s, high score %(highscore)s, start!") % {"playmode": mode, "highscore": self.statsStorage.get("hs_" + mode)})
         field = gameField.GameField()
         if random.randint(0, 4999) == 1:
@@ -735,6 +748,10 @@ class ssAppMain(window.SingletonWindow):
                  {"punches": result.punches, "hits": result.hits, "accuracy": result.hitPercentage})
         m.append(_("This game is currently lasting for %(time)s.") % {"time": result.lastedString})
         m.append(_("Level: %(level)d, player HP: %(hp)d.") % {"level": result.level, "hp": field.player.lives})
+        if rewind.getController().isAccelerated():
+            m.append(_("The game is being fast forwarded by a rewind effect (%(pitch)d%% speed).") %
+                     {"pitch": rewind.getController().getPitch()})
+        # end fast forwarded
         if field.player.autoDestructionRemaining > 0:
             m.append(_("You have %(amount)d stored destructions. You will be protected automatically instead of consuming these.") %
                      {"amount": field.player.autoDestructionRemaining})
