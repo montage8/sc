@@ -142,6 +142,10 @@ class GameField():
           never drops by itself, so this key is the only way to get it.
         / (slash): immediately removes every active nasty effect.
         ? (Shift+/): forcibly ends every active effect, good or nasty.
+        x: throws away every item which is currently falling, no matter if it
+          is good or nasty (the items shatter without being used).
+        Shift+X: collects every item which is currently falling, no matter if it
+          is good or nasty (all of their effects are applied instantly).
         """
         app = globalVars.appMain
         shift = app.keyPressing(window.K_LSHIFT) or app.keyPressing(window.K_RSHIFT)
@@ -204,6 +208,47 @@ class GameField():
                 self.stopAllItemEffects()
             else:
                 self.stopNastyItemEffects()
+        if app.keyPressed(window.K_x):
+            if shift:
+                self.collectFallingItems()
+            else:
+                self.discardFallingItems()
+
+    def getFallingItems(self):
+        """Returns the items which are currently falling and can still be
+        obtained or destroyed.
+
+        :rtype: list
+        """
+        return [e for e in self.items if e.state == itemConstants.STATE_ALIVE]
+    # end getFallingItems
+
+    def discardFallingItems(self):
+        """Cheat key x: throws away every falling item. Good and nasty items are
+        both shattered on the spot, so none of their effects is applied."""
+        targets = self.getFallingItems()
+        if len(targets) == 0:
+            self.log(_("There are no falling items to throw away!"))
+            return
+        for elem in targets:
+            elem.destroy()
+        # end for
+        self.log(_("Threw away %(count)d falling item(s)! (good and nasty)") % {"count": len(targets)})
+    # end discardFallingItems
+
+    def collectFallingItems(self):
+        """Cheat key Shift+X: collects every falling item at once. Good and nasty
+        items are both obtained, so every effect is applied immediately."""
+        targets = self.getFallingItems()
+        if len(targets) == 0:
+            self.log(_("There are no falling items to collect!"))
+            return
+        for elem in targets:
+            elem.obtain()
+            self.player.processItemHit(elem)
+        # end for
+        self.log(_("Collected %(count)d falling item(s) at once! (good and nasty)") % {"count": len(targets)})
+    # end collectFallingItems
 
     def extendGoodEffectTimes(self):
         """Cheat key v: multiplies the remaining time of every active good item
