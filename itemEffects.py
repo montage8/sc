@@ -34,14 +34,14 @@ class ItemEffectBase(object):
         self.on.play()
         self.active = True
         self.timer.restart()
-        self.player.field.log(_("A new \"%(item)s\" effect is starting!") % {"item": self.name})
+        self.player.field.log(_("A new \"%(item)s\" effect is starting!") % {"item": _(self.name)})
 
     def deactivate(self, mode):
         self.off = bgtsound.sound()
         self.off.load(self.offSound)
         self.off.play()
         self.active = False
-        self.player.field.log(_("One of your \"%(item)s\" effects is ending!") % {"item": self.name})
+        self.player.field.log(_("One of your \"%(item)s\" effects is ending!") % {"item": _(self.name)})
 
     def extend(self, ms):
         self.ex = bgtsound.sound()
@@ -50,14 +50,14 @@ class ItemEffectBase(object):
         self.ex.play()
         self.lasts += ms
         self.player.field.log(_("Your \"%(item)s\" effect has been extended for %(extended)d milliseconds! (now %(newtime)d)") %
-                              {"item": self.name, "extended": ms, "newtime": self.lasts - self.timer.elapsed})
+                              {"item": _(self.name), "extended": ms, "newtime": self.lasts - self.timer.elapsed})
 
     def summarize(self):
         """Returns the summary of this effect.
 
         :rtype: str
         """
-        return _("%(name)s: %(sec).2f seconds left") % {"name": self.name, "sec": self.calculateTimeRemaining()}
+        return _("%(name)s: %(sec).2f seconds left") % {"name": _(self.name), "sec": self.calculateTimeRemaining()}
 
     def calculateTimeRemaining(self):
         """
@@ -93,7 +93,7 @@ class ItemEffectBase(object):
         """
         self.setTimeRemainingMs(int(self.getTimeRemainingMs() * multiplier))
         self.player.field.log(_("The remaining time of your \"%(item)s\" effect has been multiplied by %(multiplier)d! (now %(sec).2f seconds)") %
-                              {"item": self.name, "multiplier": multiplier, "sec": self.calculateTimeRemaining()})
+                              {"item": _(self.name), "multiplier": multiplier, "sec": self.calculateTimeRemaining()})
     # end applyDurationCheat
 
     def frameUpdate(self, mode):

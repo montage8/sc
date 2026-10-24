@@ -2,6 +2,7 @@
 # Screaming Strike game options handler
 # Copyright (C) 2019 Yukio Nozawa <personal@nyanchangames.com>
 # License: GPL V2.0 (See copying.txt for details)
+import glob
 import locale
 import os
 import pickle
@@ -35,11 +36,46 @@ class GameOptions:
         self.leftPanningLimit = -100
         self.rightPanningLimit = 100
         self.itemVoice = "chris"
-        self.language = locale.getdefaultlocale()[0]
-        if self.language is None:
-            self.language = "en_US"  # OSX may fail to auto language detect when frozen
-        if not os.path.isdir("locale/%s" % self.language):
-            self.language = "en_US"  # No such locale in the game
+        self.language = self.detectLanguage()
+
+    def detectLanguage(self):
+        """Detects the language of the system and returns a locale folder name
+        which actually exists in the game.
+
+        The system may report a bare language code (ko), an encoding qualified
+        name (ko_KR.UTF-8) or a platform specific name (Korean_Korea on some
+        Windows setups), so the exact name is tried first and then the language
+        part is matched against the installed locales.
+
+        :rtype: str
+        """
+        detected = None
+        try:
+            detected = locale.getdefaultlocale()[0]
+        except (TypeError, ValueError):
+            # Some platforms report a language name which the locale module
+            # cannot parse (Windows reports e.g. Korean_Korea), so fall back to
+            # the raw environment and normalise it below.
+            for name in ("LC_ALL", "LC_CTYPE", "LANG", "LANGUAGE"):
+                if os.environ.get(name):
+                    detected = os.environ[name]
+                    break
+        # end try
+        if detected is None:
+            return "en_US"  # OSX may fail to auto language detect when frozen
+        detected = detected.split(":")[0].split(".")[0].replace("-", "_").strip()
+        if os.path.isdir("locale/%s" % detected):
+            return detected
+        code = detected[0:2].lower()
+        for elem in sorted(glob.glob("locale/*")):
+            if not os.path.isdir(elem):
+                continue
+            name = os.path.basename(elem)
+            if name[0:2].lower() == code:
+                return name
+        # end for
+        return "en_US"  # No such locale in the game
+    # end detectLanguage
 
     def copyFrom(self, importer):
         self.bgmVolume = importer.bgmVolume

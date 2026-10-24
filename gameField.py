@@ -296,7 +296,7 @@ class GameField():
         if len(removed) == 0:
             self.log(_("There are no nasty effects to remove!"))
             return
-        self.log(_("Removed all nasty item effects (%(items)s)!") % {"items": ", ".join(removed)})
+        self.log(_("Removed all nasty item effects (%(items)s)!") % {"items": ", ".join(_(name) for name in removed)})
     # end stopNastyItemEffects
 
     def stopAllItemEffects(self):
@@ -306,7 +306,7 @@ class GameField():
         if len(removed) == 0:
             self.log(_("There are no effects to end!"))
             return
-        self.log(_("Forcibly ended all item effects (%(items)s)!") % {"items": ", ".join(removed)})
+        self.log(_("Forcibly ended all item effects (%(items)s)!") % {"items": ", ".join(_(name) for name in removed)})
     # end stopAllItemEffects
 
     def forgetGoodTimeCheatSnapshot(self):
