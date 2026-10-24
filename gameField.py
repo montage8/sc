@@ -60,6 +60,8 @@ class GameField():
         # Remaining times of good effects, remembered before the v cheat key
         # multiplied them, so Shift+V can restore the original values exactly.
         self.goodTimeCheatSnapshot = {}
+        # The same for every effect (good and nasty), used by j / Shift+J.
+        self.allTimeCheatSnapshot = {}
         # Debug repeating destruction (Shift+F): performs an instant destruction
         # every 0.25 seconds until toggled off, without the powerup prep sound.
         self.repeatDestructing = False
@@ -137,6 +139,9 @@ class GameField():
         Additional cheat keys:
         v: multiplies the remaining time of every active good effect by 100.
         Shift+V: restores those times to the values from before pressing v.
+        j: multiplies the remaining time of every active effect by 100, no
+          matter if it is good or nasty.
+        Shift+J: restores those times to the values from before pressing j.
         . (period): starts the score multiplier effect, which multiplies every
           point gain by 10000 while it is active. The score multiplier item
           never drops by itself, so this key is the only way to get it.
@@ -196,6 +201,11 @@ class GameField():
                 self.restoreGoodEffectTimes()
             else:
                 self.extendGoodEffectTimes()
+        if app.keyPressed(window.K_j):
+            if shift:
+                self.restoreAllEffectTimes()
+            else:
+                self.extendAllEffectTimes()
         if app.keyPressed(window.K_n):
             if shift:
                 self.applyNastyEffect(itemConstants.NASTY_REWIND)
@@ -250,19 +260,60 @@ class GameField():
         self.log(_("Collected %(count)d falling item(s) at once! (good and nasty)") % {"count": len(targets)})
     # end collectFallingItems
 
+    def extendEffectTimes(self, snapshot, effectType=None):
+        """Multiplies the remaining time of the active item effects by 100.
+
+        The remaining times from before the first multiplication are remembered
+        in the given snapshot, so they can be restored exactly afterwards.
+
+        :param snapshot: Dictionary in which the original remaining times are kept.
+        :type snapshot: dict
+        :param effectType: If given, only the effects of this type (TYPE_GOOD or
+                           TYPE_NASTY) are extended. Otherwise every active
+                           effect is extended.
+        :type effectType: int
+
+        :rtype: int
+        """
+        extended = 0
+        for elem in self.player.itemEffects:
+            if effectType is not None and elem.effectType != effectType:
+                continue
+            if elem not in snapshot:
+                snapshot[elem] = elem.getTimeRemainingMs()
+            elem.applyDurationCheat(itemConstants.EFFECT_TIME_CHEAT_MULTIPLIER)
+            extended += 1
+        # end for
+        return extended
+    # end extendEffectTimes
+
+    def restoreEffectTimes(self, snapshot):
+        """Restores the effect times which were remembered before the cheat key
+        multiplied them, and empties the snapshot.
+
+        :param snapshot: Dictionary in which the original remaining times are kept.
+        :type snapshot: dict
+
+        :rtype: int
+        """
+        restored = 0
+        for elem in self.player.itemEffects[:]:
+            if elem not in snapshot:
+                continue
+            elem.setTimeRemainingMs(snapshot.pop(elem))
+            restored += 1
+            self.log(_("The remaining time of your \"%(item)s\" effect has been restored! (now %(sec).2f seconds)") %
+                     {"item": _(elem.name), "sec": elem.calculateTimeRemaining()})
+        # end for
+        snapshot.clear()
+        return restored
+    # end restoreEffectTimes
+
     def extendGoodEffectTimes(self):
         """Cheat key v: multiplies the remaining time of every active good item
         effect by 100. The remaining times before the first multiplication are
         remembered so Shift+V can restore them."""
-        extended = 0
-        for elem in self.player.itemEffects:
-            if elem.effectType != itemConstants.TYPE_GOOD:
-                continue
-            if elem not in self.goodTimeCheatSnapshot:
-                self.goodTimeCheatSnapshot[elem] = elem.getTimeRemainingMs()
-            elem.applyDurationCheat(itemConstants.EFFECT_TIME_CHEAT_MULTIPLIER)
-            extended += 1
-        # end for
+        extended = self.extendEffectTimes(self.goodTimeCheatSnapshot, itemConstants.TYPE_GOOD)
         if extended == 0:
             self.log(_("There are no good effects to extend!"))
             return
@@ -273,26 +324,39 @@ class GameField():
     def restoreGoodEffectTimes(self):
         """Cheat key Shift+V: restores the good effect remaining times which were
         remembered before the v cheat key multiplied them."""
-        restored = 0
-        for elem in self.player.itemEffects[:]:
-            if elem not in self.goodTimeCheatSnapshot:
-                continue
-            elem.setTimeRemainingMs(self.goodTimeCheatSnapshot.pop(elem))
-            restored += 1
-            self.log(_("The remaining time of your \"%(item)s\" effect has been restored! (now %(sec).2f seconds)") %
-                     {"item": elem.name, "sec": elem.calculateTimeRemaining()})
-        # end for
-        self.goodTimeCheatSnapshot = {}
+        restored = self.restoreEffectTimes(self.goodTimeCheatSnapshot)
         if restored == 0:
             self.log(_("There are no good effect times to restore!"))
             return
         self.log(_("Restored the original time of %(count)d good effect(s).") % {"count": restored})
     # end restoreGoodEffectTimes
 
+    def extendAllEffectTimes(self):
+        """Cheat key j: multiplies the remaining time of every active item effect
+        by 100, no matter if it is good or nasty. The remaining times before the
+        first multiplication are remembered so Shift+J can restore them."""
+        extended = self.extendEffectTimes(self.allTimeCheatSnapshot)
+        if extended == 0:
+            self.log(_("There are no effects to extend!"))
+            return
+        self.log(_("The time of %(count)d item effect(s) has been multiplied by %(multiplier)d! Press Shift+J to restore it.") %
+                 {"count": extended, "multiplier": itemConstants.EFFECT_TIME_CHEAT_MULTIPLIER})
+    # end extendAllEffectTimes
+
+    def restoreAllEffectTimes(self):
+        """Cheat key Shift+J: restores every effect remaining time which was
+        remembered before the j cheat key multiplied it."""
+        restored = self.restoreEffectTimes(self.allTimeCheatSnapshot)
+        if restored == 0:
+            self.log(_("There are no effect times to restore!"))
+            return
+        self.log(_("Restored the original time of %(count)d item effect(s).") % {"count": restored})
+    # end restoreAllEffectTimes
+
     def stopNastyItemEffects(self):
         """Cheat key /: immediately removes every active nasty item effect."""
         removed = self.player.removeItemEffects(itemConstants.TYPE_NASTY)
-        self.forgetGoodTimeCheatSnapshot()
+        self.forgetTimeCheatSnapshots()
         if len(removed) == 0:
             self.log(_("There are no nasty effects to remove!"))
             return
@@ -303,17 +367,22 @@ class GameField():
         """Cheat key ?: forcibly ends every active item effect, good or nasty."""
         removed = self.player.removeItemEffects()
         self.goodTimeCheatSnapshot = {}
+        self.allTimeCheatSnapshot = {}
         if len(removed) == 0:
             self.log(_("There are no effects to end!"))
             return
         self.log(_("Forcibly ended all item effects (%(items)s)!") % {"items": ", ".join(_(name) for name in removed)})
     # end stopAllItemEffects
 
-    def forgetGoodTimeCheatSnapshot(self):
-        """Drops the remembered good effect times of effects which are gone."""
-        remaining = [e for e in self.player.itemEffects]
-        self.goodTimeCheatSnapshot = {e: t for e, t in self.goodTimeCheatSnapshot.items() if e in remaining}
-    # end forgetGoodTimeCheatSnapshot
+    def forgetTimeCheatSnapshots(self):
+        """Drops the remembered effect times of effects which are gone."""
+        remaining = self.player.itemEffects
+        for snapshot in (self.goodTimeCheatSnapshot, self.allTimeCheatSnapshot):
+            for elem in list(snapshot):
+                if elem not in remaining:
+                    del snapshot[elem]
+        # end for
+    # end forgetTimeCheatSnapshots
 
     def applyGoodEffect(self, identifier):
         """Applies a good item effect to the player as if the item was obtained."""
