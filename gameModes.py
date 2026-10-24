@@ -156,7 +156,7 @@ class ArcadeModeHandler(ModeHandlerBase):
     def spawnItem(self):
         spd = random.randint(100, 800)
         t = itemConstants.TYPE_NASTY if random.randint(1, 100) <= spd / 10 else itemConstants.TYPE_GOOD
-        ident = self.selectNastyItem() if t == item.TYPE_NASTY else random.randint(0, item.GOOD_MAX)
+        ident = self.selectNastyItem() if t == item.TYPE_NASTY else random.choice(itemConstants.GOOD_RANDOM_ITEMS)
         i = item.Item()
         i.initialize(self.field, random.randint(0, self.field.x - 1), spd, t, ident)
         self.field.items.append(i)

@@ -12,7 +12,7 @@ import window
 
 
 class ItemEffectBase(object):
-    def initialize(self, player, onSound, offSound, name):
+    def initialize(self, player, onSound, offSound, name, effectType=itemConstants.TYPE_GOOD):
         self.paused = False
         self.player = player
         self.active = False
@@ -21,6 +21,8 @@ class ItemEffectBase(object):
         self.offSound = offSound
         self.lasts = itemConstants.BASE_EFFECT_TIME
         self.name = name
+        self.effectType = effectType
+        self.scoreMultiplier = 1
         self.on = None
         self.off = None
         self.ex = None
@@ -64,6 +66,35 @@ class ItemEffectBase(object):
         """
         return (self.lasts - self.timer.elapsed) / 1000
 
+    def getTimeRemainingMs(self):
+        """Returns the time after which this effect expires in milliseconds.
+
+        :rtype: int
+        """
+        remaining = self.lasts - self.timer.elapsed
+        return remaining if remaining > 0 else 0
+
+    def setTimeRemainingMs(self, ms):
+        """Forces the time after which this effect expires.
+
+        :param ms: New remaining time in milliseconds.
+        :type ms: int
+        """
+        if ms < 0:
+            ms = 0
+        self.lasts = self.timer.elapsed + ms
+
+    def applyDurationCheat(self, multiplier):
+        """Multiplies the remaining time of this effect (v cheat key).
+
+        :param multiplier: Multiplier to apply.
+        :type multiplier: int
+        """
+        self.setTimeRemainingMs(int(self.getTimeRemainingMs() * multiplier))
+        self.player.field.log(_("The remaining time of your \"%(item)s\" effect has been multiplied by %(multiplier)d! (now %(sec).2f seconds)") %
+                              {"item": self.name, "multiplier": multiplier, "sec": self.calculateTimeRemaining()})
+    # end applyDurationCheat
+
     def frameUpdate(self, mode):
         if self.active is not True:
             return False
@@ -89,7 +120,7 @@ class ItemEffectBase(object):
 
 class ShrinkEffect(ItemEffectBase):
     def initialize(self, player):
-        super().initialize(player, globalVars.appMain.sounds["shrink.ogg"], globalVars.appMain.sounds["shrinkFade.ogg"], "Shrink")
+        super().initialize(player, globalVars.appMain.sounds["shrink.ogg"], globalVars.appMain.sounds["shrinkFade.ogg"], "Shrink", itemConstants.TYPE_NASTY)
 
     def activate(self, mode):
         super().activate(mode)
@@ -102,7 +133,7 @@ class ShrinkEffect(ItemEffectBase):
 
 class BlurredEffect(ItemEffectBase):
     def initialize(self, player):
-        super().initialize(player, globalVars.appMain.sounds["blurred.ogg"], globalVars.appMain.sounds["blurredFade.ogg"], "Blurred")
+        super().initialize(player, globalVars.appMain.sounds["blurred.ogg"], globalVars.appMain.sounds["blurredFade.ogg"], "Blurred", itemConstants.TYPE_NASTY)
 
     def frameUpdate(self, mode):
         if super().frameUpdate(mode) is False:
@@ -121,7 +152,7 @@ class BlurredEffect(ItemEffectBase):
 
 class SlowDownEffect(ItemEffectBase):
     def initialize(self, player):
-        super().initialize(player, globalVars.appMain.sounds["slowDown.ogg"], globalVars.appMain.sounds["slowDownFade.ogg"], "Slow down")
+        super().initialize(player, globalVars.appMain.sounds["slowDown.ogg"], globalVars.appMain.sounds["slowDownFade.ogg"], "Slow down", itemConstants.TYPE_NASTY)
 
     def activate(self, mode):
         super().activate(mode)
@@ -169,3 +200,22 @@ class PenetrationEffect(ItemEffectBase):
     def deactivate(self, mode):
         super().deactivate(mode)
         self.player.setPenetration(False)
+
+
+class ScoreMultiplierEffect(ItemEffectBase):
+    """Score multiplier effect.
+
+    While this effect is active, every point the player gains is multiplied by
+    itemConstants.SCORE_CHEAT_MULTIPLIER. It starts and ends exactly like the
+    boost effect (same sounds, same life time).
+    """
+
+    def initialize(self, player):
+        super().initialize(player, globalVars.appMain.sounds["boost.ogg"], globalVars.appMain.sounds["boostFade.ogg"],
+                           itemConstants.NAMES[itemConstants.TYPE_GOOD][itemConstants.GOOD_SCOREMULTIPLIER])
+        self.scoreMultiplier = itemConstants.SCORE_CHEAT_MULTIPLIER
+
+    def activate(self, mode):
+        super().activate(mode)
+        self.player.field.log(_("Every point you gain is now multiplied by %(multiplier)d!") %
+                              {"multiplier": self.scoreMultiplier})
