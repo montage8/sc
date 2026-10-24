@@ -543,7 +543,8 @@ class ssAppMain(window.SingletonWindow):
 
     def eraseDataDialog(self):
         """Shows the erase data dialog. Returns when user leaves this menu."""
-        m = self.createMenu(_("Select the data to erase"), [_("Highscores"), _("Collections"), _("Back")])
+        m = self.createMenu(_("Select the data to erase"), [
+            _("Highscores"), _("Collections"), _("Erase all data and settings"), _("Back")])
         m.open()
         while(True):
             self.frameUpdate()
@@ -564,9 +565,36 @@ class ssAppMain(window.SingletonWindow):
                 self.collectionStorage.reset()
                 self.say(_("Your collections are all reset!"))
                 continue
+            if r == 2:
+                self.eraseAllData()
+                continue
             # end what to reset
         # end while
     # end eraseDataDialog
+
+    def eraseAllData(self):
+        """Resets everything the game has saved: the high scores, the play
+        counts (which decide whether a mode's tip is still shown), the collected
+        screams and every option (volumes, panning limits, item voice and the
+        language). The reset state is written to disk right away, so it sticks
+        even if the game is force closed right after this.
+
+        The update bookkeeping file (lastVersion.dat) is deliberately left alone:
+        it only decides whether the changelog is shown after an update, and
+        removing it would surprise the player with the changelog instead.
+        """
+        self.statsStorage.resetAll()
+        self.statsStorage.save(STATS_DATA_FILENAME)
+        self.collectionStorage.reset()
+        self.collectionStorage.save(COLLECTION_DATA_FILENAME)
+        self.options = gameOptions.GameOptions()
+        self.options.initialize(None)  # falls back to the default settings
+        self.options.save(OPTIONS_FILENAME)
+        self.resetItemVoice()
+        self.music.volume = self.options.bgmVolume
+        bgtsound.setGlobalSfxVolume(self.options.sfxVolume)
+        self.say(_("All data and settings have been reset! Restart the game to apply the language setting."))
+    # end eraseAllData
 
     def optionsDialog(self):
         """Shows the game options menu. It returns when the menu is closed and all required i/o is finished."""

@@ -50,6 +50,7 @@ In the collection screen, use your left and right arrows to browse your collecti
 
 6: Erasing data &6
 The "Erase data" option in the main menu enables you to clear your high score and collection data separately. In order to actually delete the data, you need to hold shift and enter.
+The "Erase all data and settings" option resets everything at once: your high scores, your collections, the play counts (so that the tips of every mode are shown again) and all of the options, including the language. Like the other entries, it only works while you hold shift and press enter.
 
 7: Options &7
 You can change various game settings here. Use your up and down arrows to move through the available settings and left and right arrows to change its value. Currently, there's only one item announcement voice, so pressing left / right arrows there won't change anything. If someone can give me new voice sets, I may be able to make this option actually changable.
