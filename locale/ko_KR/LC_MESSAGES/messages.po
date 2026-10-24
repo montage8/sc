@@ -44,17 +44,17 @@ msgstr "%(misses)d연속 빗나감 감점!"
 msgid "%(name)s: %(sec).2f seconds left"
 msgstr "%(name)s, %(sec).2f초 남음"
 
-#: ssAppMain.py:722
+#: ssAppMain.py:750
 #, python-format
 msgid "%(playmode)s, high score %(highscore)s, start!"
 msgstr "%(playmode)s, 최고 점수 %(highscore)s, 시작!"
 
-#: ssAppMain.py:687
+#: ssAppMain.py:715
 #, python-format
 msgid "%(voice)s cannot be loaded."
 msgstr "%(voice)s 음성을 불러올 수 없습니다."
 
-#: ssAppMain.py:788
+#: ssAppMain.py:816
 msgid "-- Last 10 logs --"
 msgstr "-- 최근 기록 10개 --"
 
@@ -77,20 +77,24 @@ msgstr "새로운 \"%(item)s\" 효과가 시작됩니다!"
 msgid "Activating destruction!"
 msgstr "파괴 효과를 발동합니다!"
 
-#: ssAppMain.py:784
+#: ssAppMain.py:812
 #, python-format
 msgid "Active item effects: %(fx)d"
 msgstr "활성화된 아이템 효과 %(fx)d개"
+
+#: ssAppMain.py:596
+msgid "All data and settings have been reset! Restart the game to apply the language setting."
+msgstr "모든 데이터와 설정을 초기화했습니다! 언어 설정을 적용하려면 게임을 다시 시작하세요."
 
 #: ssAppMain.py:272
 msgid "Arcade mode"
 msgstr "아케이드 모드"
 
-#: ssAppMain.py:482 ssAppMain.py:505 ssAppMain.py:546
+#: ssAppMain.py:482 ssAppMain.py:505 ssAppMain.py:547
 msgid "Back"
 msgstr "뒤로"
 
-#: ssAppMain.py:577
+#: ssAppMain.py:605
 msgid "Background music volume"
 msgstr "배경 음악 음량"
 
@@ -106,15 +110,15 @@ msgstr "부스트"
 msgid "Burden mode"
 msgstr "버든 모드"
 
-#: ssAppMain.py:1086
+#: ssAppMain.py:1114
 msgid "Changelog"
 msgstr "변경 내역"
 
-#: ssAppMain.py:596
+#: ssAppMain.py:624
 msgid "Changes discarded."
 msgstr "변경 사항을 취소했습니다."
 
-#: ssAppMain.py:1048
+#: ssAppMain.py:1076
 msgid "Choose 'Forcefully shutdown' or alt+f4 to abort the download."
 msgstr "'강제 종료'를 선택하거나 알트+F4를 눌러 다운로드를 중단하세요."
 
@@ -122,7 +126,7 @@ msgstr "'강제 종료'를 선택하거나 알트+F4를 눌러 다운로드를 �
 msgid "Classic mode"
 msgstr "클래식 모드"
 
-#: ssAppMain.py:824
+#: ssAppMain.py:852
 msgid "Close"
 msgstr "닫기"
 
@@ -135,11 +139,11 @@ msgstr "떨어지고 있던 아이템 %(count)d개를 한꺼번에 획득했습�
 msgid "Collection"
 msgstr "수집"
 
-#: ssAppMain.py:546
+#: ssAppMain.py:547
 msgid "Collections"
 msgstr "수집품"
 
-#: ssAppMain.py:898
+#: ssAppMain.py:926
 #, python-format
 msgid "Congratulations! Your score has ranked in position %(pos)d! Keep up your great work!"
 msgstr "축하합니다! %(pos)d위에 올랐습니다! 계속 힘내세요!"
@@ -148,11 +152,11 @@ msgstr "축하합니다! %(pos)d위에 올랐습니다! 계속 힘내세요!"
 msgid "Destruction"
 msgstr "파괴"
 
-#: ssAppMain.py:874
+#: ssAppMain.py:902
 msgid "Do you want to post this score to the scoreboard?"
 msgstr "이 점수를 스코어보드에 등록할까요?"
 
-#: ssAppMain.py:1036
+#: ssAppMain.py:1064
 msgid "Download job has ended! Press enter to close the application."
 msgstr "다운로드가 끝났습니다! 엔터를 눌러 게임을 종료하세요."
 
@@ -164,6 +168,10 @@ msgstr "새 버전을 내려받는 중입니다 (%(current)dK/%(total)dK, %(perc
 #: gameField.py:568
 msgid "End destruction!"
 msgstr "파괴 효과가 끝났습니다!"
+
+#: ssAppMain.py:547
+msgid "Erase all data and settings"
+msgstr "모든 데이터 및 설정 초기화"
 
 #: ssAppMain.py:289
 msgid "Erase data"
@@ -188,12 +196,12 @@ msgstr "생명이 늘어났습니다! (현재 생명 %(lives)d개)"
 msgid "Failed to download the new update (%(reason)s). Press enter to retry."
 msgstr "새 업데이트를 내려받지 못했습니다. (%(reason)s) 엔터를 눌러 다시 시도하세요."
 
-#: ssAppMain.py:840
+#: ssAppMain.py:868
 #, python-format
 msgid "Final score: %(score)d"
 msgstr "최종 점수 %(score)d"
 
-#: ssAppMain.py:1028
+#: ssAppMain.py:1056
 msgid "Forcefully shutdown"
 msgstr "강제 종료"
 
@@ -215,11 +223,11 @@ msgstr "게임 오버!"
 msgid "Game over! Final score: %(score)d"
 msgstr "게임 오버! 최종 점수 %(score)d"
 
-#: ssAppMain.py:766
+#: ssAppMain.py:794
 msgid "Game paused"
 msgstr "게임을 일시정지했습니다"
 
-#: ssAppMain.py:839
+#: ssAppMain.py:867
 msgid "Game result"
 msgstr "게임 결과"
 
@@ -233,7 +241,7 @@ msgstr "%(startedtime)s에 게임을 시작했습니다!"
 msgid "Highest boost: %(boost)sx"
 msgstr "최고 배율 %(boost)s배"
 
-#: ssAppMain.py:546
+#: ssAppMain.py:547
 msgid "Highscores"
 msgstr "최고 점수"
 
@@ -252,7 +260,7 @@ msgstr "명중! (속도 %(speed)d, 거리 %(distance)d)"
 msgid "Hit! (speed %(speed)d, distance %(distance)d, penetration bonus added)"
 msgstr "명중! (속도 %(speed)d, 거리 %(distance)d, 관통 보너스 적용)"
 
-#: ssAppMain.py:556
+#: ssAppMain.py:557
 msgid "Hold shift and enter to erase."
 msgstr "쉬프트를 누른 채 엔터를 누르면 지워집니다."
 
@@ -264,19 +272,19 @@ msgstr "저장된 파괴를 몇 개로 설정할까요?"
 msgid "How many times should destruction repeat (every 0.5 seconds)?"
 msgstr "파괴를 0.5초마다 몇 번 반복할까요?"
 
-#: ssAppMain.py:581
+#: ssAppMain.py:609
 msgid "Item announcement voice"
 msgstr "아이템 안내 음성"
 
-#: ssAppMain.py:582
+#: ssAppMain.py:610
 msgid "Language (restart to apply)"
 msgstr "언어 (다시 시작해야 적용됩니다)"
 
-#: ssAppMain.py:579
+#: ssAppMain.py:607
 msgid "Left panning limit"
 msgstr "왼쪽 팬 한계"
 
-#: ssAppMain.py:775
+#: ssAppMain.py:803
 #, python-format
 msgid "Level: %(level)d, player HP: %(hp)d."
 msgstr "레벨 %(level)d, 남은 생명 %(hp)d."
@@ -298,16 +306,16 @@ msgstr "메인 메뉴입니다. 위아래 화살표로 항목을 고르고, 엔�
 msgid "Megaton punch"
 msgstr "메가톤 펀치"
 
-#: ssAppMain.py:877
+#: ssAppMain.py:905
 msgid "Name entry"
 msgstr "이름 입력"
 
-#: ssAppMain.py:842
+#: ssAppMain.py:870
 #, python-format
 msgid "New high score! Plus %(distance)d (last: %(last)d)"
 msgstr "신기록입니다! 이전 기록보다 %(distance)d점 앞섰습니다. (이전 기록: %(last)d)"
 
-#: ssAppMain.py:969
+#: ssAppMain.py:997
 msgid "No"
 msgstr "아니오"
 
@@ -334,7 +342,7 @@ msgstr "\"%(item)s\" 효과가 끝났습니다!"
 msgid "Options"
 msgstr "설정"
 
-#: ssAppMain.py:576
+#: ssAppMain.py:604
 msgid "Options Menu, use your up and down arrows to choose an option, left and right arrows to change values, enter to save or escape to discard changes"
 msgstr "설정 메뉴입니다. 위아래 화살표로 항목을 고르고, 좌우 화살표로 값을 바꿉니다. 엔터를 누르면 저장하고, 이스케이프를 누르면 변경 사항을 취소합니다"
 
@@ -347,7 +355,7 @@ msgstr "관통"
 msgid "Playing: %(mode)s, high score: %(highscore)d."
 msgstr "%(mode)s 플레이 중입니다. 최고 점수는 %(highscore)d점입니다."
 
-#: ssAppMain.py:876 ssAppMain.py:877
+#: ssAppMain.py:904 ssAppMain.py:905
 msgid "Please input your name."
 msgstr "이름을 입력하세요."
 
@@ -360,11 +368,11 @@ msgstr "확인할 게임 모드를 선택하세요"
 msgid "Point: %(added).1f %(changestr)s (%(total).1f)"
 msgstr "점수 %(added).1f점 %(changestr)s (합계 %(total).1f)"
 
-#: ssAppMain.py:767
+#: ssAppMain.py:795
 msgid "Press enter or escape to resume. Use your up and down arrows to view current stats."
 msgstr "엔터나 이스케이프를 누르면 게임이 계속됩니다. 위아래 화살표로 현재 상태를 확인하세요."
 
-#: ssAppMain.py:772 ssAppMain.py:847
+#: ssAppMain.py:800 ssAppMain.py:875
 #, python-format
 msgid "Punches: %(punches)d, hits: %(hits)d, accuracy: %(accuracy).2f%%"
 msgstr "펀치 %(punches)d회, 명중 %(hits)d회, 정확도 %(accuracy).2f%%"
@@ -404,7 +412,7 @@ msgstr "모든 효과 %(count)d개의 시간을 원래대로 되돌렸습니다.
 msgid "Rewind"
 msgstr "되감기"
 
-#: ssAppMain.py:580
+#: ssAppMain.py:608
 msgid "Right panning limit."
 msgstr "오른쪽 팬 한계"
 
@@ -417,7 +425,7 @@ msgstr "점수 배율"
 msgid "Score multiplier x%(multiplier)d! %(fromscore).1f points became %(toscore).1f points."
 msgstr "점수 %(multiplier)d배! %(fromscore).1f점이 %(toscore).1f점이 되었습니다."
 
-#: ssAppMain.py:874
+#: ssAppMain.py:902
 msgid "Score posting"
 msgstr "점수 등록"
 
@@ -426,7 +434,7 @@ msgstr "점수 등록"
 msgid "Score table for %(mode)s"
 msgstr "%(mode)s 스코어보드"
 
-#: ssAppMain.py:768
+#: ssAppMain.py:796
 #, python-format
 msgid "Score: %(score)d"
 msgstr "점수 %(score)d"
@@ -439,7 +447,7 @@ msgstr "지울 데이터를 선택하세요"
 msgid "Select the folder where you want to download the installer."
 msgstr "설치 파일을 내려받을 폴더를 선택하세요."
 
-#: ssAppMain.py:602
+#: ssAppMain.py:630
 msgid "Settings saved"
 msgstr "설정을 저장했습니다"
 
@@ -451,7 +459,7 @@ msgstr "축소"
 msgid "Slow down"
 msgstr "감속"
 
-#: ssAppMain.py:578
+#: ssAppMain.py:606
 msgid "Sound effects volume"
 msgstr "효과음 음량"
 
@@ -464,7 +472,7 @@ msgstr "저장된 파괴"
 msgid "Stored destruction count is now %(r)d!"
 msgstr "저장된 파괴 개수를 %(r)d개로 바꿨습니다!"
 
-#: ssAppMain.py:1081
+#: ssAppMain.py:1109
 #, python-format
 msgid "The changelog file written in the selected language doesn't seem to exist. If you can write one and contribute, please create %(filename)s and contact the developer."
 msgstr "선택한 언어로 작성된 변경 내역 파일이 없습니다. 직접 작성해 기여하시려면 %(filename)s 파일을 만들어 개발자에게 알려 주세요."
@@ -474,7 +482,7 @@ msgstr "선택한 언어로 작성된 변경 내역 파일이 없습니다. 직�
 msgid "The effective range of your Punch is now %(range)d (from %(from)d)"
 msgstr "펀치의 유효 사거리가 바뀌었습니다. 이전에는 %(from)d, 지금은 %(range)d입니다"
 
-#: ssAppMain.py:777
+#: ssAppMain.py:805
 #, python-format
 msgid "The game is being fast forwarded by a rewind effect (%(pitch)d%% speed)."
 msgstr "되감기 효과로 게임이 빨리 감기 중입니다. (속도 %(pitch)d%%)"
@@ -558,7 +566,7 @@ msgstr "제거할 나쁜 효과가 없습니다!"
 msgid "There is a new version of the game! Press enter here to download it."
 msgstr "새 버전이 나왔습니다! 여기서 엔터를 눌러 내려받으세요."
 
-#: ssAppMain.py:890
+#: ssAppMain.py:918
 #, python-format
 msgid "There was an error while posting your score (%(error)s). Please try again later."
 msgstr "점수를 등록하는 중 오류가 발생했습니다. (%(error)s) 나중에 다시 시도해 주세요."
@@ -568,7 +576,7 @@ msgstr "점수를 등록하는 중 오류가 발생했습니다. (%(error)s) 나
 msgid "There was an error while retrieving software update information (%(error)s). Please try again later."
 msgstr "업데이트 정보를 가져오는 중 오류가 발생했습니다. (%(error)s) 나중에 다시 시도해 주세요."
 
-#: ssAppMain.py:886
+#: ssAppMain.py:914
 #, python-format
 msgid "This build of %(gamename)s does not support score posting. Sorry!"
 msgstr "%(gamename)s의 이 빌드는 점수 등록을 지원하지 않습니다. 죄송합니다!"
@@ -588,12 +596,12 @@ msgstr "%(gamename)s의 이 빌드에는 내려받을 위치가 설정되어 있
 msgid "This effect will be used when it's necessary! (Remaining %(r)d)"
 msgstr "이 효과는 필요할 때 자동으로 사용됩니다! (남은 개수 %(r)d)"
 
-#: ssAppMain.py:774
+#: ssAppMain.py:802
 #, python-format
 msgid "This game is currently lasting for %(time)s."
 msgstr "이번 게임은 지금까지 %(time)s 동안 이어지고 있습니다."
 
-#: ssAppMain.py:853
+#: ssAppMain.py:881
 #, python-format
 msgid "This game lasted for %(time)s."
 msgstr "이번 게임은 %(time)s 동안 진행되었습니다."
@@ -626,7 +634,7 @@ msgstr "힌트: %s (엔터를 누르면 이 힌트를 닫습니다)"
 msgid "Unlocked"
 msgstr "해금됨"
 
-#: ssAppMain.py:820
+#: ssAppMain.py:848
 #, python-format
 msgid "Unlocked %(number)d %(collection)s!"
 msgstr "%(number)d번째 %(collection)s 해금!"
@@ -636,7 +644,7 @@ msgstr "%(number)d번째 %(collection)s 해금!"
 msgid "Update checking is disabled in this build of %(gamename)s."
 msgstr "%(gamename)s의 이 빌드에서는 업데이트 확인 기능이 꺼져 있습니다."
 
-#: ssAppMain.py:1026
+#: ssAppMain.py:1054
 msgid "Update downloading is still in progress"
 msgstr "업데이트 다운로드가 아직 진행 중입니다"
 
@@ -660,21 +668,21 @@ msgstr "경고"
 msgid "Welcome to this new and exciting burden mode! In this mode, every item gives you a nasty effect, and each nasty effect boosts points you gain! Guess what? The more you torture yourself, the more point boost you get! Oh, but if you die because of your own torturous act, hahahahahaha, you stupid! Good luck!"
 msgstr "새롭고 짜릿한 버든 모드에 오신 것을 환영합니다! 이 모드에서는 모든 아이템이 나쁜 효과를 주고, 나쁜 효과 하나하나가 획득 점수를 높여 줍니다! 그렇습니다. 자신을 더 괴롭힐수록 더 많은 점수를 얻습니다! 아, 하지만 스스로 괴롭히다가 죽는다면, 하하하하하하, 바보! 행운을 빕니다!"
 
-#: ssAppMain.py:968
+#: ssAppMain.py:996
 msgid "Yes"
 msgstr "예"
 
-#: ssAppMain.py:770
+#: ssAppMain.py:798
 #, python-format
 msgid "You are updating your high score. Currently plus %(distance)d (last: %(last)d)"
 msgstr "최고 점수를 갱신 중입니다. 지금 %(distance)d점 앞서 있습니다. (이전 기록: %(last)d)"
 
-#: ssAppMain.py:781
+#: ssAppMain.py:809
 #, python-format
 msgid "You have %(amount)d stored destructions. You will be protected automatically instead of consuming these."
 msgstr "저장된 파괴가 %(amount)d개 있습니다. 공격받으면 하나씩 소모되면서 자동으로 보호됩니다."
 
-#: ssAppMain.py:854
+#: ssAppMain.py:882
 #, python-format
 msgid "You reached level %(level)d."
 msgstr "레벨 %(level)d에 도달했습니다."
@@ -697,11 +705,11 @@ msgstr "공격당했습니다! (남은 생명 %(lives)d)"
 msgid "Your \"%(item)s\" effect has been extended for %(extended)d milliseconds! (now %(newtime)d)"
 msgstr "\"%(item)s\" 효과가 %(extended)d밀리초 연장되었습니다! (현재 %(newtime)d밀리초)"
 
-#: ssAppMain.py:565
+#: ssAppMain.py:566
 msgid "Your collections are all reset!"
 msgstr "수집품이 모두 초기화되었습니다!"
 
-#: ssAppMain.py:561
+#: ssAppMain.py:562
 msgid "Your highscores are all reset!"
 msgstr "최고 점수가 모두 초기화되었습니다!"
 
@@ -713,7 +721,7 @@ msgstr "이제 펀치가 적과 아이템을 관통하지 않습니다!"
 msgid "Your punches now penetrate enemies and items!"
 msgstr "이제 펀치가 적과 아이템을 관통합니다!"
 
-#: ssAppMain.py:895
+#: ssAppMain.py:923
 msgid "Your score was posted, but you were not ranked in. Better luck next time!"
 msgstr "점수는 등록되었지만 순위에 들지 못했습니다. 다음 기회에 힘내세요!"
 
@@ -721,11 +729,11 @@ msgstr "점수는 등록되었지만 순위에 들지 못했습니다. 다음 �
 msgid "added"
 msgstr "추가"
 
-#: ssAppMain.py:819
+#: ssAppMain.py:847
 msgid "collection"
 msgstr "수집품"
 
-#: ssAppMain.py:819
+#: ssAppMain.py:847
 msgid "collections"
 msgstr "수집품"
 
