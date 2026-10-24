@@ -14,6 +14,7 @@ import item
 import itemConstants
 import itemVoicePlayer
 import player
+import rewind
 import window
 
 
@@ -129,11 +130,16 @@ class GameField():
         lowercase letter makes the corresponding item fall from the sky.
         The lowercase "h" drops a random positive (good) item.
 
+        The nasty items have keys too: "n" drops the rewind item, which fast
+        forwards the whole game (music, every sound and the in-game time) while
+        it is active. Shift+N applies that effect instantly.
+
         Additional cheat keys:
         v: multiplies the remaining time of every active good effect by 100.
         Shift+V: restores those times to the values from before pressing v.
         . (period): starts the score multiplier effect, which multiplies every
-          point gain by 10000 while it is active.
+          point gain by 10000 while it is active. The score multiplier item
+          never drops by itself, so this key is the only way to get it.
         / (slash): immediately removes every active nasty effect.
         ? (Shift+/): forcibly ends every active effect, good or nasty.
         """
@@ -186,6 +192,11 @@ class GameField():
                 self.restoreGoodEffectTimes()
             else:
                 self.extendGoodEffectTimes()
+        if app.keyPressed(window.K_n):
+            if shift:
+                self.applyNastyEffect(itemConstants.NASTY_REWIND)
+            else:
+                self.spawnDebugItem(itemConstants.TYPE_NASTY, itemConstants.NASTY_REWIND)
         if app.keyPressed(window.K_PERIOD):
             self.applyGoodEffect(itemConstants.GOOD_SCOREMULTIPLIER)
         if app.keyPressed(window.K_SLASH):
@@ -262,6 +273,11 @@ class GameField():
     def applyGoodEffect(self, identifier):
         """Applies a good item effect to the player as if the item was obtained."""
         it = _DebugItem(itemConstants.TYPE_GOOD, identifier)
+        self.player.processItemHit(it)
+
+    def applyNastyEffect(self, identifier):
+        """Applies a nasty item effect to the player as if the item was obtained."""
+        it = _DebugItem(itemConstants.TYPE_NASTY, identifier)
         self.player.processItemHit(it)
 
     def addExtraLives(self, amount):
@@ -407,6 +423,11 @@ class GameField():
     def clear(self):
         self.enemies = []
         self.items = []
+        # The gameplay is over. Stop accelerating the in-game time right away
+        # and let the pitch of the rewind (fast-forward) effect glide back down
+        # at the same rate as it climbed, just like the music pitch does when a
+        # game ends.
+        rewind.getController().endGameplay()
 
     def startDestruction(self):
         if self.destructing:
@@ -496,3 +517,6 @@ class GameField():
         self.repeatDestructTimer.setPaused(p)
         self.scheduledDestructTimer.setPaused(p)
         self.gameTimer.setPaused(p)
+        # The rewind (fast-forward) pitch glide must stop along with the game,
+        # otherwise the pitch would keep climbing while nothing else moves.
+        rewind.getController().setPaused(p)

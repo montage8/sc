@@ -37,6 +37,7 @@ Nasty effects:
 Shrink: Your punches will be shorter. When obtained continuously, effects will be duplicated.
 Slow down: Your punches will be slower. When obtained continuously, effects will be duplicated.
 Blurred: You'll get your position blurred and can't aim at enemies accurately. When obtained continuously, effects will be duplicated.
+Rewind: The whole game is fast forwarded. Not only the music, but the time itself flows faster, and every sound (the enemies, the falling items, the sound effects and so on) is pitched up along with it. The pitch climbs for about 3 seconds, exactly as fast as the music pitch descends when the game ends, and it glides back down the same way when the effect ends. When obtained continuously, effects will be duplicated.
 
 4: Burden mode &4
 In the burden mode, items fall from above like the arcade mode. However, in this mode, all items cause nasty effects on you. The burden mode's objective is to defeat enemies under as many nasty item effects as possible, boost up points and achieve higher scores.
