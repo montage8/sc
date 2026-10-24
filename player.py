@@ -239,6 +239,17 @@ class Player():
             else:
                 existing.extend(itemConstants.BASE_EFFECT_TIME)
             return
+        if it.identifier == itemConstants.GOOD_SCOREMULTIPLIER:
+            existing = self.findEffect(
+                itemConstants.NAMES[itemConstants.TYPE_GOOD][itemConstants.GOOD_SCOREMULTIPLIER])
+            if existing is None:
+                e = itemEffects.ScoreMultiplierEffect()
+                e.initialize(self)
+                e.activate(self.field.modeHandler)
+                self.itemEffects.append(e)
+            else:
+                existing.extend(itemConstants.BASE_EFFECT_TIME)
+            return
         if it.identifier == itemConstants.GOOD_DESTRUCTION:
             ok = self.field.startDestruction()
             if not ok:  # Already destructing
@@ -256,6 +267,37 @@ class Player():
         if it.identifier == itemConstants.GOOD_RESETENEMIES:
             self.field.resetEnemies()
             return
+
+    def getScoreMultiplier(self):
+        """Returns the multiplier which is currently applied to every point
+        this player gains. Returns 1 when no score multiplier effect is active.
+
+        :rtype: int
+        """
+        multiplier = 1
+        for elem in self.itemEffects:
+            if elem.scoreMultiplier > multiplier:
+                multiplier = elem.scoreMultiplier
+        return multiplier
+
+    def removeItemEffects(self, effectType=None):
+        """Immediately ends (deactivates) active item effects. Used by the
+        cheat keys. Returns the names of the effects which have been ended.
+
+        :param effectType: If given, only the effects of this type (TYPE_GOOD or
+                           TYPE_NASTY) are ended. Otherwise every active effect
+                           is ended.
+        :type effectType: int
+        :rtype: list
+        """
+        removed = []
+        for elem in self.itemEffects[:]:
+            if effectType is not None and elem.effectType != effectType:
+                continue
+            elem.deactivate(self.field.modeHandler)
+            self.itemEffects.remove(elem)
+            removed.append(elem.name)
+        return removed
 
     def findEffect(self, name):
         """
@@ -352,6 +394,12 @@ class Player():
         :param score: Score to add.
         :type score: int
         """
+        multiplier = self.getScoreMultiplier()
+        if score > 0 and multiplier > 1:
+            multiplied = score * multiplier
+            self.field.log(_("Score multiplier x%(multiplier)d! %(fromscore).1f points became %(toscore).1f points.") %
+                           {"multiplier": multiplier, "fromscore": score, "toscore": multiplied})
+            score = multiplied
         self.score += score
         self.score_validator.append(score)
         if self.gotHighscore is False and self.score >= self.lastHighscore:

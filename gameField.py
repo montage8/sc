@@ -56,6 +56,9 @@ class GameField():
         self.levelupBonus.initialize()
         self.destructing = False
         self.destructTimer = window.Timer()
+        # Remaining times of good effects, remembered before the v cheat key
+        # multiplied them, so Shift+V can restore the original values exactly.
+        self.goodTimeCheatSnapshot = {}
         # Debug repeating destruction (Shift+F): performs an instant destruction
         # every 0.25 seconds until toggled off, without the powerup prep sound.
         self.repeatDestructing = False
@@ -125,6 +128,14 @@ class GameField():
         Uppercase (Shift + letter) applies an effect instantly, while the
         lowercase letter makes the corresponding item fall from the sky.
         The lowercase "h" drops a random positive (good) item.
+
+        Additional cheat keys:
+        v: multiplies the remaining time of every active good effect by 100.
+        Shift+V: restores those times to the values from before pressing v.
+        . (period): starts the score multiplier effect, which multiplies every
+          point gain by 10000 while it is active.
+        / (slash): immediately removes every active nasty effect.
+        ? (Shift+/): forcibly ends every active effect, good or nasty.
         """
         app = globalVars.appMain
         shift = app.keyPressing(window.K_LSHIFT) or app.keyPressing(window.K_RSHIFT)
@@ -149,7 +160,7 @@ class GameField():
             else:
                 self.spawnDebugItem(itemConstants.TYPE_GOOD, itemConstants.GOOD_EXTRALIFE)
         if app.keyPressed(window.K_h):
-            self.spawnDebugItem(itemConstants.TYPE_GOOD, random.randint(0, itemConstants.GOOD_MAX))
+            self.spawnDebugItem(itemConstants.TYPE_GOOD, random.choice(itemConstants.GOOD_RANDOM_ITEMS))
         if app.keyPressed(window.K_g):
             if shift:
                 self.applyGoodEffect(itemConstants.GOOD_RESETENEMIES)
@@ -170,6 +181,83 @@ class GameField():
                 self.toggleRepeatDestruction()
             else:
                 self.promptScheduledDestruction()
+        if app.keyPressed(window.K_v):
+            if shift:
+                self.restoreGoodEffectTimes()
+            else:
+                self.extendGoodEffectTimes()
+        if app.keyPressed(window.K_PERIOD):
+            self.applyGoodEffect(itemConstants.GOOD_SCOREMULTIPLIER)
+        if app.keyPressed(window.K_SLASH):
+            if shift:
+                self.stopAllItemEffects()
+            else:
+                self.stopNastyItemEffects()
+
+    def extendGoodEffectTimes(self):
+        """Cheat key v: multiplies the remaining time of every active good item
+        effect by 100. The remaining times before the first multiplication are
+        remembered so Shift+V can restore them."""
+        extended = 0
+        for elem in self.player.itemEffects:
+            if elem.effectType != itemConstants.TYPE_GOOD:
+                continue
+            if elem not in self.goodTimeCheatSnapshot:
+                self.goodTimeCheatSnapshot[elem] = elem.getTimeRemainingMs()
+            elem.applyDurationCheat(itemConstants.EFFECT_TIME_CHEAT_MULTIPLIER)
+            extended += 1
+        # end for
+        if extended == 0:
+            self.log(_("There are no good effects to extend!"))
+            return
+        self.log(_("The time of %(count)d good effect(s) has been multiplied by %(multiplier)d! Press Shift+V to restore it.") %
+                 {"count": extended, "multiplier": itemConstants.EFFECT_TIME_CHEAT_MULTIPLIER})
+    # end extendGoodEffectTimes
+
+    def restoreGoodEffectTimes(self):
+        """Cheat key Shift+V: restores the good effect remaining times which were
+        remembered before the v cheat key multiplied them."""
+        restored = 0
+        for elem in self.player.itemEffects[:]:
+            if elem not in self.goodTimeCheatSnapshot:
+                continue
+            elem.setTimeRemainingMs(self.goodTimeCheatSnapshot.pop(elem))
+            restored += 1
+            self.log(_("The remaining time of your \"%(item)s\" effect has been restored! (now %(sec).2f seconds)") %
+                     {"item": elem.name, "sec": elem.calculateTimeRemaining()})
+        # end for
+        self.goodTimeCheatSnapshot = {}
+        if restored == 0:
+            self.log(_("There are no good effect times to restore!"))
+            return
+        self.log(_("Restored the original time of %(count)d good effect(s).") % {"count": restored})
+    # end restoreGoodEffectTimes
+
+    def stopNastyItemEffects(self):
+        """Cheat key /: immediately removes every active nasty item effect."""
+        removed = self.player.removeItemEffects(itemConstants.TYPE_NASTY)
+        self.forgetGoodTimeCheatSnapshot()
+        if len(removed) == 0:
+            self.log(_("There are no nasty effects to remove!"))
+            return
+        self.log(_("Removed all nasty item effects (%(items)s)!") % {"items": ", ".join(removed)})
+    # end stopNastyItemEffects
+
+    def stopAllItemEffects(self):
+        """Cheat key ?: forcibly ends every active item effect, good or nasty."""
+        removed = self.player.removeItemEffects()
+        self.goodTimeCheatSnapshot = {}
+        if len(removed) == 0:
+            self.log(_("There are no effects to end!"))
+            return
+        self.log(_("Forcibly ended all item effects (%(items)s)!") % {"items": ", ".join(removed)})
+    # end stopAllItemEffects
+
+    def forgetGoodTimeCheatSnapshot(self):
+        """Drops the remembered good effect times of effects which are gone."""
+        remaining = [e for e in self.player.itemEffects]
+        self.goodTimeCheatSnapshot = {e: t for e, t in self.goodTimeCheatSnapshot.items() if e in remaining}
+    # end forgetGoodTimeCheatSnapshot
 
     def applyGoodEffect(self, identifier):
         """Applies a good item effect to the player as if the item was obtained."""
