@@ -87,8 +87,8 @@ msgid "All data and settings have been reset! Restart the game to apply the lang
 msgstr "모든 데이터와 설정을 초기화했습니다! 언어 설정을 적용하려면 게임을 다시 시작하세요."
 
 #: gameField.py:144
-msgid "An enemy came close to the vegetable and died on its own!"
-msgstr "적이 식물인간 가까이 와서 저절로 죽었습니다!"
+msgid "An enemy reached the vegetable and died on the spot!"
+msgstr "적이 식물인간의 위치까지 다가와서 저절로 죽었습니다!"
 
 #: ssAppMain.py:272
 msgid "Arcade mode"
@@ -483,6 +483,10 @@ msgstr "축소"
 msgid "Slow down"
 msgstr "감속"
 
+#: gameField.py
+msgid "Slow down: for as long as you are a vegetable"
+msgstr "감속: 식물인간인 동안 계속됩니다"
+
 #: ssAppMain.py:680
 msgid "Sound effects volume"
 msgstr "효과음 음량"
@@ -832,4 +836,3 @@ msgstr "초"
 #: player.py:636
 msgid "subtracted"
 msgstr "감소"
-

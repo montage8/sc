@@ -37,15 +37,24 @@ GOOD_RANDOM_ITEMS = [GOOD_MEGATONPUNCH, GOOD_BOOST, GOOD_PENETRATION,
                      GOOD_DESTRUCTION, GOOD_EXTRALIFE]
 
 # "Vegetable" (plant) state. When the player's last life is taken away, the
-# player first screams and only afterwards falls down. Pressing U during the
-# scream refuses death and turns the player into a vegetable instead: the player
-# cannot punch or move any more, and every enemy which comes close dies on the
-# spot. Pressing shift+U then finishes the player off.
+# player screams and only afterwards falls down, exactly like before. Pressing U
+# while the scream is audible refuses death and turns the player into a
+# vegetable instead: the player cannot punch or move any more, and every enemy
+# which reaches the player's position dies on the spot. The vegetable state has
+# no duration: it goes on until the player eats an extra life item (revived) or
+# presses shift+U (gives up and dies).
 DEATH_PHASE_SCREAM = 0
 DEATH_PHASE_FALL = 1
-DEATH_SCREAM_TIME = 900  # milliseconds the scream lasts (window for U)
+# Milliseconds the scream lasts at least, so that U can be pressed even when the
+# scream itself is short.
+DEATH_SCREAM_TIME = 2500
+# Upper limit of the scream phase in case the scream sound never reports that it
+# has finished playing.
+DEATH_SCREAM_MAX_TIME = 6000
 DEATH_FALL_TIME = 900  # milliseconds between hitting the ground and game over
-PLANT_KILL_RANGE = 2  # enemies at this distance or closer die on their own
+# Enemies at this distance or closer die on their own. 0 means the enemy has to
+# reach the vegetable's own position.
+PLANT_KILL_RANGE = 0
 
 # Cheat multipliers. Pressing v multiplies the remaining time of all active good
 # effects by this value, and the score multiplier effect multiplies every point

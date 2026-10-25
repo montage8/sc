@@ -167,6 +167,30 @@ class SlowDownEffect(ItemEffectBase):
         self.player.setPunchSpeed(self.player.punchSpeed / mode.getSlowDownMultiplier())
 
 
+class PlantSlowDownEffect(SlowDownEffect):
+    """The slow down of the vegetable (plant) state.
+
+    Unlike every other effect this one has no duration: the vegetable state
+    lasts until the player eats an extra life item or gives up with shift+U, and
+    the effect is removed only then. It is therefore ignored by the duration
+    cheats (v, j) and by the cheats which stop effects (/, ?).
+    """
+
+    permanent = True
+
+    def frameUpdate(self, mode):
+        return self.active is True
+
+    def summarize(self):
+        return _("Slow down: for as long as you are a vegetable")
+
+    def extend(self, ms):
+        pass  # the vegetable state is not a timed effect
+
+    def applyDurationCheat(self, multiplier):
+        pass  # the vegetable state is not a timed effect
+
+
 class MegatonPunchEffect(ItemEffectBase):
     def initialize(self, player):
         super().initialize(player, globalVars.appMain.sounds["megatonPunch.ogg"], globalVars.appMain.sounds["megatonPunchFade.ogg"], "Megaton punch")
