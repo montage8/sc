@@ -48,26 +48,221 @@ class Player():
         self.autoDestructionRemaining = 0
         self.lastHighscore = globalVars.appMain.statsStorage.get("hs_" + self.field.modeHandler.getName())
         self.gotHighscore = False
+        # Instant unlock effect (cheat key l): every punched enemy is unlocked
+        # in the collection right away.
+        self.instantUnlock = False
+        # Death sequence: scream first, then fall down. Pressing U while the
+        # scream is audible turns the player into a vegetable instead of dying.
+        self.dying = False
+        self.dyingPhase = None
+        self.dead = False
+        self.deathTimer = window.Timer()
+        self.deathScream = None
+        self.deathFall = None
+        # Vegetable state (see enterPlantMode).
+        self.plantMode = False
+        self.plantSlowDown = None
+        # True once the bodyfall of the death sequence has been played, so the
+        # game over sequence does not play it a second time.
+        self.deathSoundPlayed = False
 
     def frameUpdate(self):
         """Call this method once per frame to keep everything updated."""
         self.consecutiveHitBonus.frameUpdate()
         self.consecutiveMissUnbonus.frameUpdate()
-        if self.punching is False and globalVars.appMain.keyPressed(window.K_SPACE):
-            self.punchLaunch()
-        if self.punching is True and self.punchTimer.elapsed >= self.punchSpeed:
-            self.punchHit()
-        if self.x != 0 and globalVars.appMain.keyPressed(window.K_LEFT):
-            self.moveTo(self.x - 1)
-        if self.x != self.field.getX() - 1 and globalVars.appMain.keyPressed(window.K_RIGHT):
-            self.moveTo(self.x + 1)
+        self.updateDeathSequence()
+        if self.dead is True:
+            return
+        if self.plantMode is True:
+            # A vegetable cannot punch, cannot move and cannot be moved by the
+            # blurred effect. Only the item effects keep running (and the slow
+            # down effect of the vegetable state is kept alive).
+            self.updatePlantMode()
+        else:
+            if self.punching is False and globalVars.appMain.keyPressed(window.K_SPACE):
+                self.punchLaunch()
+            if self.punching is True and self.punchTimer.elapsed >= self.punchSpeed:
+                self.punchHit()
+            if self.x != 0 and globalVars.appMain.keyPressed(window.K_LEFT):
+                self.moveTo(self.x - 1)
+            if self.x != self.field.getX() - 1 and globalVars.appMain.keyPressed(window.K_RIGHT):
+                self.moveTo(self.x + 1)
         for elem in self.itemEffects[:]:
             if not elem.frameUpdate(self.field.modeHandler):
                 self.itemEffects.remove(elem)
 
+    def updateDeathSequence(self):
+        """Advances the death sequence. Called from frameUpdate."""
+        if self.dying is not True:
+            return
+        if self.dyingPhase == itemConstants.DEATH_PHASE_SCREAM and self.deathTimer.elapsed >= itemConstants.DEATH_SCREAM_TIME:
+            self.startFall()
+            return
+        if self.dyingPhase == itemConstants.DEATH_PHASE_FALL and self.deathTimer.elapsed >= itemConstants.DEATH_FALL_TIME:
+            self.finishDeath()
+    # end updateDeathSequence
+
+    def startDeath(self):
+        """Starts the death sequence by screaming. Called when the last life is
+        lost. For a short while after this, U refuses death (see
+        enterPlantMode)."""
+        if self.dying is True or self.plantMode is True or self.dead is True:
+            return
+        self.dying = True
+        self.dyingPhase = itemConstants.DEATH_PHASE_SCREAM
+        self.deathTimer.restart()
+        self.deathScream = bgtsound.sound()
+        self.deathScream.load(globalVars.appMain.sounds["scream%d.ogg" % random.randint(
+            0, max(0, globalVars.appMain.getNumScreams() - 1))])
+        self.deathScream.pitch = random.randint(70, 95)
+        self.deathScream.play()
+        self.field.log(_("You scream as your last life is taken away!"))
+        self.field.log(_("Press U before you hit the ground to refuse death and become a vegetable!"))
+    # end startDeath
+
+    def startFall(self):
+        """Moves the death sequence on to falling down. From this moment on U
+        can no longer save the player."""
+        self.dying = True
+        self.dyingPhase = itemConstants.DEATH_PHASE_FALL
+        self.deathTimer.restart()
+        self.deathFall = bgtsound.sound()
+        self.deathFall.load(globalVars.appMain.sounds["dead.ogg"])
+        self.deathFall.pitch = random.randint(80, 100)
+        self.deathFall.play()
+        self.deathSoundPlayed = True
+        self.field.log(_("You fall to the ground!"))
+    # end startFall
+
+    def finishDeath(self):
+        """Ends the death sequence. The game field sees the dead flag and ends
+        the game."""
+        self.dying = False
+        self.dyingPhase = None
+        self.dead = True
+        s = bgtsound.sound()
+        s.load(globalVars.appMain.sounds["gameover.ogg"])
+        s.volume = -10
+        s.play()
+        self.field.log(_("Game over!"))
+    # end finishDeath
+
+    def canEnterPlantMode(self):
+        """Returns whether U can turn this player into a vegetable right now,
+        that is, while the player is screaming after losing the last life.
+
+        :rtype: bool
+        """
+        if self.plantMode is True or self.dead is True:
+            return False
+        if self.lives > 0:
+            return False
+        return self.dying is True and self.dyingPhase == itemConstants.DEATH_PHASE_SCREAM
+    # end canEnterPlantMode
+
+    def enterPlantMode(self):
+        """Cheat key U: refuses death and becomes a vegetable. The player can no
+        longer punch or move, and every enemy which comes close dies on its own.
+        An extra life item is needed to come back.
+
+        :rtype: bool
+        """
+        if self.plantMode is True:
+            self.field.log(_("You are already a vegetable!"))
+            return False
+        if self.lives > 0:
+            self.field.log(_("You can only become a vegetable at the very moment you would die!"))
+            return False
+        if self.dying is not True:
+            self.field.log(_("You can only become a vegetable at the very moment you would die!"))
+            return False
+        if self.dyingPhase != itemConstants.DEATH_PHASE_SCREAM:
+            self.field.log(_("It's too late! You have already hit the ground."))
+            return False
+        # Stop the scream which was about to end in death.
+        self.dying = False
+        self.dyingPhase = None
+        if self.deathScream is not None:
+            self.deathScream.stop()
+        self.lives = 0
+        self.plantMode = True
+        self.plantSlowDown = None
+        self.field.log(_("You refused death and became a vegetable! You cannot punch or move, but every enemy which comes close dies on its own."))
+        self.field.log(_("Eat an extra life item (for example with shift+X) to come back. Press shift+U to give up and die."))
+        self.applyPlantSlowDown()
+        return True
+    # end enterPlantMode
+
+    def applyPlantSlowDown(self):
+        """Makes sure the vegetable state is slowed down. Called when the
+        vegetable state starts and whenever its slow down effect is gone."""
+        if self.plantSlowDown is not None and self.plantSlowDown in self.itemEffects:
+            return
+        e = itemEffects.SlowDownEffect()
+        e.initialize(self)
+        e.activate(self.field.modeHandler)
+        self.itemEffects.append(e)
+        self.plantSlowDown = e
+    # end applyPlantSlowDown
+
+    def updatePlantMode(self):
+        """Keeps the vegetable state running. Called from frameUpdate."""
+        self.applyPlantSlowDown()
+    # end updatePlantMode
+
+    def exitPlantMode(self):
+        """Leaves the vegetable state (either because an extra life was eaten or
+        because the player gave up). Returns whether the state was left."""
+        if self.plantMode is not True:
+            return False
+        self.plantMode = False
+        if self.plantSlowDown is not None and self.plantSlowDown in self.itemEffects:
+            self.plantSlowDown.deactivate(self.field.modeHandler)
+            self.itemEffects.remove(self.plantSlowDown)
+        self.plantSlowDown = None
+        return True
+    # end exitPlantMode
+
+    def reviveFromPlantMode(self):
+        """Called when this player gains a life while being a vegetable. Returns
+        to normal gameplay."""
+        if self.exitPlantMode() is not True:
+            return False
+        self.field.log(_("The extra life brought you back! You can punch and move again."))
+        return True
+    # end reviveFromPlantMode
+
+    def giveUpAndDie(self):
+        """Cheat key Shift+U: gives up the vegetable state and dies. The bodyfall
+        sound is played and the game ends right after it.
+
+        :rtype: bool
+        """
+        if self.plantMode is not True:
+            self.field.log(_("You are not a vegetable!"))
+            return False
+        self.exitPlantMode()
+        self.lives = 0
+        self.startFall()
+        return True
+    # end giveUpAndDie
+
+    def setInstantUnlock(self, p):
+        """Enables / disables the instant unlock effect.
+
+        :param p: Whether a single punch unlocks a collection.
+        :type p: bool
+        """
+        if p is True:
+            self.field.log(_("Your punches now unlock screams in one hit!"))
+        else:
+            self.field.log(_("Your punches no longer unlock screams in one hit."))
+        self.instantUnlock = p
+    # end setInstantUnlock
+
     def punchLaunch(self):
         """Launches a punch. If this player is already punching, this method does nothing. """
-        if self.punching:
+        if self.punching or self.plantMode is True or self.dead is True:
             return
         self.punches += 1
         self.punching = True
@@ -269,6 +464,21 @@ class Player():
             s.load(globalVars.appMain.sounds["extraLife.ogg"])
             s.pitch = 60 + (self.lives * 10)
             s.play()
+            if self.plantMode is True:
+                self.reviveFromPlantMode()
+            # end revive
+            return
+        if it.identifier == itemConstants.GOOD_INSTANTUNLOCK:
+            existing = self.findEffect(
+                itemConstants.NAMES[itemConstants.TYPE_GOOD][itemConstants.GOOD_INSTANTUNLOCK])
+            if existing is None:
+                e = itemEffects.InstantUnlockEffect()
+                e.initialize(self)
+                e.activate(self.field.modeHandler)
+                self.itemEffects.append(e)
+            else:
+                existing.extend(itemConstants.BASE_EFFECT_TIME)
+            # end if existing
             return
         if it.identifier == itemConstants.GOOD_RESETENEMIES:
             self.field.resetEnemies()
@@ -380,18 +590,29 @@ class Player():
 
             return False
         # end auto destruction
+        if self.dying is True or self.dead is True:
+            # Already screaming / falling: further attacks change nothing.
+            return False
+        # end dying
+        if self.plantMode is True:
+            # A vegetable is not slapped any more; the attacker dies instead.
+            return False
+        # end plant
         self.lives -= 1
         self.field.log(_("You've been slapped! (%(lives)d HP remaining)") % {"lives": self.lives})
         s = bgtsound.sound()
         if self.lives > 0:
             s.load(globalVars.appMain.sounds["attacked.ogg"])
             s.play()
-        else:
-            self.field.log(_("Game over!"))
-            s.load(globalVars.appMain.sounds["gameover.ogg"])
-            s.volume = -10
-            s.play()
+            return True
+        # end survived
+        if self.lives <= 0:
+            # The last life is gone: scream first, fall down later. Pressing U
+            # while screaming refuses death (see enterPlantMode).
+            self.lives = 0
+            self.startDeath()
             return False
+        # end dying
 
     def addScore(self, score):
         """
@@ -444,6 +665,7 @@ class Player():
             elem.setPaused(p)
         # end item effects
         self.punchTimer.setPaused(p)
+        self.deathTimer.setPaused(p)
     # end pause
 
 

@@ -845,10 +845,15 @@ class ssAppMain(window.SingletonWindow):
         # end while
         field.clear()
         self.wait(2000)
-        s = bgtsound.sound()
-        s.load(self.sounds["dead.ogg"])
-        s.pitch = random.randint(70, 130)
-        s.play()
+        if field.player.deathSoundPlayed is not True:
+            # The death sequence plays the bodyfall itself (see
+            # player.startFall); play it here only when the game ended without
+            # that sequence having run (e.g. the player aborted the game).
+            s = bgtsound.sound()
+            s.load(self.sounds["dead.ogg"])
+            s.pitch = random.randint(70, 130)
+            s.play()
+        # end bodyfall
         self.wait(800)
         with open("result.txt", mode='a', encoding='utf-8') as f:
             f.write(field.exportLog())
@@ -882,6 +887,10 @@ class ssAppMain(window.SingletonWindow):
         if field.player.autoDestructionRemaining > 0:
             m.append(_("You have %(amount)d stored destructions. You will be protected automatically instead of consuming these.") %
                      {"amount": field.player.autoDestructionRemaining})
+        if field.player.plantMode:
+            m.append(_("You are a vegetable right now. You cannot punch or move, and every enemy which comes close dies on its own."))
+            m.append(_("Eat an extra life item to come back, or press shift+U to give up and die."))
+        # end vegetable
         if len(field.player.itemEffects) > 0:
             m.append(_("Active item effects: %(fx)d") % {"fx": len(field.player.itemEffects)})
         for elem in field.player.itemEffects:

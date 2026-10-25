@@ -139,6 +139,9 @@ class BlurredEffect(ItemEffectBase):
     def frameUpdate(self, mode):
         if super().frameUpdate(mode) is False:
             return False
+        if self.player.plantMode is True:
+            return True  # a vegetable never moves, even when blurred
+        # end plant
         if random.randint(1, 10) == 1:
             while(True):
                 d = random.randint(0, self.player.field.getX() - 1)
@@ -250,3 +253,24 @@ class RewindEffect(ItemEffectBase):
     def deactivate(self, mode):
         super().deactivate(mode)
         rewind.getController().releaseAcceleration()
+
+
+class InstantUnlockEffect(ItemEffectBase):
+    """Instant unlock effect (cheat key l).
+
+    While this effect is active, every enemy the player punches is unlocked in
+    the collection immediately, so a single punch is enough instead of ten.
+    """
+
+    def initialize(self, player):
+        super().initialize(player, globalVars.appMain.sounds["penetration.ogg"],
+                           globalVars.appMain.sounds["penetrationFade.ogg"],
+                           itemConstants.NAMES[itemConstants.TYPE_GOOD][itemConstants.GOOD_INSTANTUNLOCK])
+
+    def activate(self, mode):
+        super().activate(mode)
+        self.player.setInstantUnlock(True)
+
+    def deactivate(self, mode):
+        super().deactivate(mode)
+        self.player.setInstantUnlock(False)

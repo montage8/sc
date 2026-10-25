@@ -111,7 +111,7 @@ class GameField():
             return True
         # end if destruct
         self.player.frameUpdate()
-        if self.player.lives <= 0:
+        if self.player.dead is True:
             self.log(_("Game over! Final score: %(score)d") % {"score": self.player.score})
             return False
         # end if
@@ -120,10 +120,33 @@ class GameField():
                 self.enemies[i] = None
             if self.enemies[i] is not None:
                 self.enemies[i].frameUpdate()
+                self.processPlantKill(self.enemies[i])
             if self.enemies[i] is None:
                 self.spawnEnemy(i)
         # end for
         return True
+
+    def processPlantKill(self, e):
+        """While the player is a vegetable, every enemy which comes close
+        screams and dies on its own. Called from frameUpdate for each enemy.
+
+        :param e: Enemy to check.
+        :type e: enemy.Enemy
+
+        :rtype: bool
+        """
+        if self.player.plantMode is not True:
+            return False
+        if e is None or e.state != enemy.STATE_ALIVE:
+            return False
+        if e.y > itemConstants.PLANT_KILL_RANGE:
+            return False
+        self.log(_("An enemy came close to the vegetable and died on its own!"))
+        e.hit()
+        self.modeHandler.onEnemyDefeated()
+        self.logDefeat()
+        return True
+    # end processPlantKill
 
     def handleDebugKeys(self):
         """Handles debug / cheat keys. These work identically in every game mode.
@@ -147,6 +170,14 @@ class GameField():
           never drops by itself, so this key is the only way to get it.
         / (slash): immediately removes every active nasty effect.
         ? (Shift+/): forcibly ends every active effect, good or nasty.
+        u: while the player is screaming after losing the last life, refuses
+          death and turns the player into a vegetable (plant state). Everything
+          slows down, the player can no longer punch or move, and every enemy
+          which comes close dies on its own.
+        Shift+U: while being a vegetable, gives up and dies (bodyfall, then game
+          over).
+        l: starts the instant unlock effect: any enemy punched while it is
+          active unlocks its scream in the collection at once.
         x: throws away every item which is currently falling, no matter if it
           is good or nasty (the items shatter without being used).
         Shift+X: collects every item which is currently falling, no matter if it
@@ -223,6 +254,13 @@ class GameField():
                 self.collectFallingItems()
             else:
                 self.discardFallingItems()
+        if app.keyPressed(window.K_u):
+            if shift:
+                self.player.giveUpAndDie()
+            else:
+                self.player.enterPlantMode()
+        if app.keyPressed(window.K_l):
+            self.applyGoodEffect(itemConstants.GOOD_INSTANTUNLOCK)
 
     def getFallingItems(self):
         """Returns the items which are currently falling and can still be
