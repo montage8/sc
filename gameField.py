@@ -127,8 +127,10 @@ class GameField():
         return True
 
     def processPlantKill(self, e):
-        """While the player is a vegetable, every enemy which comes close
-        screams and dies on its own. Called from frameUpdate for each enemy.
+        """While the player is a vegetable, every enemy which reaches the
+        player's own position screams and dies on the spot (the vegetable dies
+        neither from the slap nor from anything else). Called from frameUpdate
+        for each enemy.
 
         :param e: Enemy to check.
         :type e: enemy.Enemy
@@ -141,7 +143,7 @@ class GameField():
             return False
         if e.y > itemConstants.PLANT_KILL_RANGE:
             return False
-        self.log(_("An enemy came close to the vegetable and died on its own!"))
+        self.log(_("An enemy reached the vegetable and died on the spot!"))
         e.hit()
         self.modeHandler.onEnemyDefeated()
         self.logDefeat()
@@ -171,9 +173,11 @@ class GameField():
         / (slash): immediately removes every active nasty effect.
         ? (Shift+/): forcibly ends every active effect, good or nasty.
         u: while the player is screaming after losing the last life, refuses
-          death and turns the player into a vegetable (plant state). Everything
-          slows down, the player can no longer punch or move, and every enemy
-          which comes close dies on its own.
+          death and turns the player into a vegetable (plant state). The player
+          slows down, can no longer punch or move, and every enemy which reaches
+          the player's own position dies on the spot. The vegetable state has no
+          duration: it ends only when an extra life item is eaten (the player is
+          revived) or when shift+U is pressed (the player gives up and dies).
         Shift+U: while being a vegetable, gives up and dies (bodyfall, then game
           over).
         l: starts the instant unlock effect: any enemy punched while it is
@@ -315,6 +319,9 @@ class GameField():
         """
         extended = 0
         for elem in self.player.itemEffects:
+            if getattr(elem, "permanent", False):
+                continue  # the vegetable slow down has no duration
+            # end permanent
             if effectType is not None and elem.effectType != effectType:
                 continue
             if elem not in snapshot:
@@ -439,6 +446,9 @@ class GameField():
         s = bgtsound.sound()
         s.load(globalVars.appMain.sounds["extraLife.ogg"])
         s.play()
+        if self.player.plantMode is True:
+            self.player.reviveFromPlantMode()
+        # end revive
 
     def resetEnemies(self):
         """Resets the enemy progression back to the exact state of a fresh game

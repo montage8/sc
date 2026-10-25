@@ -92,14 +92,30 @@ class Player():
                 self.itemEffects.remove(elem)
 
     def updateDeathSequence(self):
-        """Advances the death sequence. Called from frameUpdate."""
+        """Advances the death sequence. Called from frameUpdate.
+
+        The player screams first and falls down afterwards. As long as the
+        scream is audible (and for a minimum amount of time), U can still be
+        pressed to refuse death, so the fall never starts before the player had
+        a real chance to react.
+        """
         if self.dying is not True:
             return
-        if self.dyingPhase == itemConstants.DEATH_PHASE_SCREAM and self.deathTimer.elapsed >= itemConstants.DEATH_SCREAM_TIME:
+        if self.dyingPhase == itemConstants.DEATH_PHASE_SCREAM:
+            if self.deathTimer.elapsed < itemConstants.DEATH_SCREAM_MAX_TIME:
+                if self.deathScream is not None and self.deathScream.playing is True:
+                    return  # still screaming: keep the window for U open
+                # end still screaming
+                if self.deathTimer.elapsed < itemConstants.DEATH_SCREAM_TIME:
+                    return  # the scream was short, but U must stay possible
+                # end minimum time
+            # end scream phase
             self.startFall()
             return
+        # end scream phase
         if self.dyingPhase == itemConstants.DEATH_PHASE_FALL and self.deathTimer.elapsed >= itemConstants.DEATH_FALL_TIME:
             self.finishDeath()
+        # end fall phase
     # end updateDeathSequence
 
     def startDeath(self):
@@ -195,10 +211,13 @@ class Player():
 
     def applyPlantSlowDown(self):
         """Makes sure the vegetable state is slowed down. Called when the
-        vegetable state starts and whenever its slow down effect is gone."""
+        vegetable state starts and whenever its slow down effect is gone.
+
+        The effect used here has no duration: the vegetable state lasts until
+        the player eats an extra life item or gives up with shift+U."""
         if self.plantSlowDown is not None and self.plantSlowDown in self.itemEffects:
             return
-        e = itemEffects.SlowDownEffect()
+        e = itemEffects.PlantSlowDownEffect()
         e.initialize(self)
         e.activate(self.field.modeHandler)
         self.itemEffects.append(e)
@@ -508,6 +527,9 @@ class Player():
         """
         removed = []
         for elem in self.itemEffects[:]:
+            if getattr(elem, "permanent", False):
+                continue  # the vegetable slow down ends only with the state
+            # end permanent
             if effectType is not None and elem.effectType != effectType:
                 continue
             elem.deactivate(self.field.modeHandler)
