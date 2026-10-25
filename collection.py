@@ -34,6 +34,10 @@ class CollectionStorage(object):
         :type file: str
         """
         self.screams = []
+        # The number of screams must be known even when no data file exists yet
+        # (a fresh profile). Without this, increment() and unlockNow() ignored
+        # every scream except the first one until the file was created.
+        self.screamNum = screamNum
         if file == "":
             self.reserve(screamNum)
             return
@@ -106,6 +110,22 @@ class CollectionStorage(object):
         self.screams[number] += 1
         return self.screams[number] == UNLOCK_TRIGGER
 
+    def unlockNow(self, number):
+        """Unlocks the specified scream immediately. Returns True if it was
+        actually unlocked by this call, or False if it was already unlocked.
+
+        :param number: Scream number.
+        :type number: int
+
+        :rtype: bool
+        """
+        if number > self.screamNum:
+            return False
+        if self.screams[number] >= UNLOCK_TRIGGER:
+            return False
+        self.screams[number] = UNLOCK_TRIGGER
+        return True
+
     def get(self, number):
         """Retrieves the number of plays of the specified scream.
 
@@ -170,6 +190,22 @@ class CollectionCounter(object):
             return
         if self.storage.increment(number) is True:
             self.unlock(number)
+
+    def unlockNow(self, number):
+        """Unlocks the specified scream immediately (used by the instant unlock
+        effect). Returns True if this call unlocked it.
+
+        :param number: Scream number to unlock.
+        :type number: int
+
+        :rtype: bool
+        """
+        if self.storage is None:
+            return False
+        if self.storage.unlockNow(number) is not True:
+            return False
+        self.unlock(number)
+        return True
 
     def unlock(self, number):
         """Triggers one unlock sound. You can call this method multiple times really quickly; this object delays the following playbacks not to make them overlap.

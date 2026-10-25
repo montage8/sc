@@ -23,16 +23,29 @@ GOOD_DESTRUCTION = 3
 GOOD_EXTRALIFE = 4
 GOOD_RESETENEMIES = 5
 GOOD_SCOREMULTIPLIER = 6
-GOOD_MAX = 6
+GOOD_INSTANTUNLOCK = 7
+GOOD_MAX = 7
 
 # Good items which are allowed to drop randomly (arcade mode's automatic item
 # spawning and the "h" debug key). The reset enemies item is deliberately
 # excluded from this list: it may only be summoned with the g key. The score
 # multiplier item is excluded as well: multiplying every point gain is far too
 # strong to be left to the automatic item spawning, so it may only be started
-# with the "." cheat key.
+# with the "." cheat key. The instant unlock item is key only as well, since
+# unlocking a scream with a single punch is much too strong for random drops.
 GOOD_RANDOM_ITEMS = [GOOD_MEGATONPUNCH, GOOD_BOOST, GOOD_PENETRATION,
                      GOOD_DESTRUCTION, GOOD_EXTRALIFE]
+
+# "Vegetable" (plant) state. When the player's last life is taken away, the
+# player first screams and only afterwards falls down. Pressing U during the
+# scream refuses death and turns the player into a vegetable instead: the player
+# cannot punch or move any more, and every enemy which comes close dies on the
+# spot. Pressing shift+U then finishes the player off.
+DEATH_PHASE_SCREAM = 0
+DEATH_PHASE_FALL = 1
+DEATH_SCREAM_TIME = 900  # milliseconds the scream lasts (window for U)
+DEATH_FALL_TIME = 900  # milliseconds between hitting the ground and game over
+PLANT_KILL_RANGE = 2  # enemies at this distance or closer die on their own
 
 # Cheat multipliers. Pressing v multiplies the remaining time of all active good
 # effects by this value, and the score multiplier effect multiplies every point
@@ -60,4 +73,5 @@ NAMES[TYPE_NASTY] = {NASTY_SHRINK: "Shrink",
 NAMES[TYPE_GOOD] = {GOOD_MEGATONPUNCH: "Megaton punch", GOOD_BOOST: "Boost",
                     GOOD_PENETRATION: "Penetration", GOOD_DESTRUCTION: "Destruction", GOOD_EXTRALIFE: "Extra life",
                     GOOD_RESETENEMIES: "Reset enemies",
-                    GOOD_SCOREMULTIPLIER: "Score multiplier"}
+                    GOOD_SCOREMULTIPLIER: "Score multiplier",
+                    GOOD_INSTANTUNLOCK: "Instant unlock"}

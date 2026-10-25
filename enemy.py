@@ -122,6 +122,11 @@ class Enemy():
         s.play()
         self.playScream()
         self.field.collectionCounter.increment(self.screamNum)
+        # While the instant unlock effect is active, one punch is enough to
+        # unlock the scream in the collection.
+        if self.field.player.instantUnlock and self.field.collectionCounter.unlockNow(self.screamNum):
+            self.field.log(_("This scream was unlocked immediately!"))
+        # end instant unlock
         self.switchState(STATE_SCREAMING)
         score = self.field.modeHandler.calculateEnemyDefeatScore(self.speed, self.y)
         s = self.field.modeHandler.getDefeatMessage(self.speed, self.y)
