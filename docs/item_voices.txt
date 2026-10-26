@@ -72,6 +72,18 @@ is complained about, and a nasty item which gets destroyed is cheered. Item name
 are always spelled out in full ("blurred vision", "the blurring") instead of
 being clipped to one word.
 
+`수빈` and `하늘` (Korean, feminine) are the opposite approach: a station
+announcement. Every line is one short sentence in a calm, informative broadcast
+tone, and the wording says exactly what happened:
+
+    get   "부스트 효과가 시작되었습니다."
+    end   "부스트 효과가 끝났습니다."
+    lose  "부스트 아이템이 파괴되었습니다."
+
+The two sets use the same script with two different announcer voices; pick
+whichever suits you in the options menu. Because the lines are short, the
+announcements never overlap the next item.
+
 The Korean set deliberately keeps the emotion in the wording and the delivery
 instead of stretching the vowels ("왔다, 메가톤 펀치! 최고야, 최고!" versus
 "아휴, 메가톤 펀치가 부서졌어요. 왜 그러세요, 진짜."), because a speech engine reads
