@@ -532,13 +532,9 @@ class Player():
             # end permanent
             if effectType is not None and elem.effectType != effectType:
                 continue
-            elem.deactivate(self.field.modeHandler)
+            elem.deactivate(self.field.modeHandler)  # announces its end
             self.itemEffects.remove(elem)
             removed.append(elem.name)
-            # The effect is gone for good, so the item announces it as lost.
-            # Good effects are mourned and nasty ones are cheered about by the
-            # voice sets, which makes this the natural announcement here.
-            self.field.itemVoicePlayer.play("lose %s.ogg" % elem.name, self.field.getPan(self.x))
         # end for
         return removed
 
