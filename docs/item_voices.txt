@@ -66,6 +66,12 @@ Effects which simply run out of time stay silent, like before.
 as Ava in a different voice, so the English item chatter can be changed without
 changing the language of the game.
 
+`별` and `라라` (Korean, feminine) are the Disney style: bright, playful and
+emotional, closer to a character in an animated film than to an announcer. Good
+items are delighted about ("와, 메가톤 펀치! 이제 멀리 있는 친구들도 다 맞출 수
+있어요!"), a destroyed good item is mourned, a nasty item is complained about and
+a nasty item ending is cheered about.
+
 Recording note
 --------------
 
