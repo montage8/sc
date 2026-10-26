@@ -1,0 +1,42 @@
+Item voice sets
+===============
+
+Every folder in `data/voices` is one selectable item voice set. The folder name
+is shown (and spoken) in the options menu, and the game picks it up
+automatically, so adding a voice set is just a matter of adding a folder.
+
+File naming
+-----------
+
+Each set contains one OGG Vorbis file per announcement, named exactly
+
+    get <item name>.ogg     the player obtained the item
+    lose <item name>.ogg    the falling item was destroyed instead
+
+where `<item name>` is the English name from `itemConstants.NAMES`, for example
+`get Megaton punch.ogg` or `lose Slow down.ogg`. The prefix is lowercase; a
+capitalized prefix (as in the old `Get Megaton punch.ogg` of the Sophie set) is
+never found by the game.
+
+A missing file is not an error: that announcement is simply silent, which is how
+voices which only cover a few items keep working.
+
+Sound format
+------------
+
+The existing sets ship as mono, 22050 Hz OGG Vorbis, normalized to about -1 dBFS
+with the silence trimmed from both ends. `make_voices.py` (not part of the game)
+converts generated speech into exactly that format.
+
+The two new sets
+----------------
+
+`Ava` (English, feminine) and `지우` (Korean, feminine) are recorded in the same
+exaggerated style the Sam set is famous for: an item which helps the player is
+celebrated loudly, a helpful item which gets destroyed is mourned with a long
+"why-y-y", a nasty item is complained about, and a nasty item which gets
+destroyed is cheered. Item names are always spelled out in full ("blurred
+vision", "the blurring") instead of being clipped to one word.
+
+The voices are independent of the language setting: any voice set can be
+combined with any language.

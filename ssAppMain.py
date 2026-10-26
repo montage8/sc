@@ -118,16 +118,21 @@ class ssAppMain(window.SingletonWindow):
 
     def resetItemVoice(self):
         """
-        Resets the speaker voice settings. This function searches voices and set the first found one as default. If no voice is available, it disables item speaking.
+        Resets the speaker voice settings. The currently selected voice is kept
+        as long as it is still available; otherwise the first one is used as the
+        default. If no voice is available, item speaking is disabled.
         """
         if len(self.itemVoices) == 0:
             self.options.itemVoice = ""
-        else:
+        elif self.options.itemVoice not in self.itemVoices:
             self.options.itemVoice = self.itemVoices[0]
 
     def getItemVoicesList(self):
         """
-        Searches for available voices as item speaker. It returns detected voice names as a list.
+        Searches for available voices as item speaker. Every folder in
+        data/voices is one voice set; the folder name is the name which is shown
+        (and spoken) in the options menu. The list is sorted case insensitively
+        so that the menu order does not depend on the file system.
 
         :rtype: list
         """
@@ -135,6 +140,7 @@ class ssAppMain(window.SingletonWindow):
         for elem in glob.glob("data/voices/*"):
             if os.path.isdir(elem):
                 lst.append(os.path.basename(elem))
+        lst.sort(key=lambda name: name.lower())
         return lst
 
     def getLanguageName(self, code):
