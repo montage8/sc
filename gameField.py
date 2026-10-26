@@ -433,11 +433,31 @@ class GameField():
         """Applies a good item effect to the player as if the item was obtained."""
         it = _DebugItem(itemConstants.TYPE_GOOD, identifier)
         self.player.processItemHit(it)
+        self.playItemVoice("get", identifier, itemConstants.TYPE_GOOD)
 
     def applyNastyEffect(self, identifier):
         """Applies a nasty item effect to the player as if the item was obtained."""
         it = _DebugItem(itemConstants.TYPE_NASTY, identifier)
         self.player.processItemHit(it)
+        self.playItemVoice("get", identifier, itemConstants.TYPE_NASTY)
+
+    def playItemVoice(self, prefix, identifier, itemType):
+        """Plays an item announcement of the selected voice set.
+
+        Falling items announce themselves (see item.py). This helper does the
+        same for the effects which are applied without an item, that is the
+        cheat keys, so that every item of the game can be announced.
+
+        :param prefix: "get" or "lose".
+        :type prefix: str
+        :param identifier: Item identifier (GOOD_** / NASTY_**).
+        :type identifier: int
+        :param itemType: TYPE_GOOD or TYPE_NASTY.
+        :type itemType: int
+        """
+        name = itemConstants.NAMES[itemType][identifier]
+        self.itemVoicePlayer.play("%s %s.ogg" % (prefix, name), self.getPan(self.player.x))
+    # end playItemVoice
 
     def addExtraLives(self, amount):
         """Instantly grants the player a number of extra lives."""

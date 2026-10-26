@@ -28,15 +28,42 @@ The existing sets ship as mono, 22050 Hz OGG Vorbis, normalized to about -1 dBFS
 with the silence trimmed from both ends. `make_voices.py` (not part of the game)
 converts generated speech into exactly that format.
 
+Coverage
+--------
+
+The game knows twelve items, so a complete set has 24 files:
+
+    good items:  Megaton punch, Boost, Penetration, Destruction, Extra life,
+                 Reset enemies, Score multiplier, Instant unlock
+    nasty items: Shrink, Blurred, Slow down, Rewind
+
+The last four are not part of the classic eight, because the item they belong to
+cannot fall randomly: Reset enemies, Score multiplier and Instant unlock are
+cheat-key-only good items, and Rewind is the nasty item of the newer modes. They
+are covered by the voice sets as well:
+
+* a good item which is applied by a cheat key announces itself with its "get"
+  line (see gameField.playItemVoice),
+* an effect which is ended for good by / or ? announces itself with its "lose"
+  line (see player.removeItemEffects), which the sets use as "the item is gone":
+  a good effect is mourned and a nasty one is cheered about.
+
+Effects which simply run out of time stay silent, like before.
+
 The two new sets
 ----------------
 
 `Ava` (English, feminine) and `지우` (Korean, feminine) are recorded in the same
 exaggerated style the Sam set is famous for: an item which helps the player is
-celebrated loudly, a helpful item which gets destroyed is mourned with a long
-"why-y-y", a nasty item is complained about, and a nasty item which gets
-destroyed is cheered. Item names are always spelled out in full ("blurred
-vision", "the blurring") instead of being clipped to one word.
+celebrated loudly, a helpful item which gets destroyed is mourned, a nasty item
+is complained about, and a nasty item which gets destroyed is cheered. Item names
+are always spelled out in full ("blurred vision", "the blurring") instead of
+being clipped to one word.
+
+The Korean set deliberately keeps the emotion in the wording and the delivery
+instead of stretching the vowels ("왔다, 메가톤 펀치! 최고야, 최고!" versus
+"아휴, 메가톤 펀치가 부서졌어요. 왜 그러세요, 진짜."), because a speech engine reads
+a stretched spelling like "아니이이이" as separate syllables.
 
 The voices are independent of the language setting: any voice set can be
 combined with any language.
