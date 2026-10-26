@@ -42,6 +42,21 @@ class ItemEffectBase(object):
         self.off.play()
         self.active = False
         self.player.field.log(_("One of your \"%(item)s\" effects is ending!") % {"item": _(self.name)})
+        self.announceEnd()
+
+    def announceEnd(self):
+        """Plays the "end" announcement of this effect from the selected voice
+        set.
+
+        An effect which ends is not the same as an item which gets destroyed:
+        the destroyed item is announced with its "lose" line (see
+        item.playShatter), while an effect whose time is up, or which is stopped
+        by the / or ? cheat keys, uses its own "end" line. The voice sets mourn
+        a good effect which ends and cheer about a nasty one ending.
+        """
+        self.player.field.itemVoicePlayer.play("end %s.ogg" % self.name,
+                                              self.player.field.getPan(self.player.x))
+    # end announceEnd
 
     def extend(self, ms):
         self.ex = bgtsound.sound()
@@ -180,6 +195,9 @@ class PlantSlowDownEffect(SlowDownEffect):
 
     def frameUpdate(self, mode):
         return self.active is True
+
+    def announceEnd(self):
+        pass  # leaving the vegetable state is announced by the player itself
 
     def summarize(self):
         return _("Slow down: for as long as you are a vegetable")

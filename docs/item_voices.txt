@@ -11,7 +11,18 @@ File naming
 Each set contains one OGG Vorbis file per announcement, named exactly
 
     get <item name>.ogg     the player obtained the item
-    lose <item name>.ogg    the falling item was destroyed instead
+    lose <item name>.ogg    the falling item was destroyed
+    end <item name>.ogg     a timed effect of the item ran out / was stopped
+
+"Destroyed" and "ended" are different events and are announced separately: a
+falling item which gets punched (or which falls to the ground) is destroyed and
+uses its "lose" line, while an effect whose time is up (or which is stopped by
+the / and ? cheat keys) uses its "end" line. Only the items which have a timed
+effect need an "end" line: Megaton punch, Boost, Penetration, Score multiplier,
+Instant unlock, Shrink, Blurred, Slow down and Rewind.
+
+The emotion follows the same rule for both lines: something helpful going away
+is mourned and something nasty going away is cheered about.
 
 where `<item name>` is the English name from `itemConstants.NAMES`, for example
 `get Megaton punch.ogg` or `lose Slow down.ogg`. The prefix is lowercase; a
@@ -31,7 +42,8 @@ converts generated speech into exactly that format.
 Coverage
 --------
 
-The game knows twelve items, so a complete set has 24 files:
+The game knows twelve items, so a complete set has 33 files (12 "get", 12
+"lose" and 9 "end"):
 
     good items:  Megaton punch, Boost, Penetration, Destruction, Extra life,
                  Reset enemies, Score multiplier, Instant unlock
