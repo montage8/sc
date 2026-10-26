@@ -72,6 +72,17 @@ items are delighted about ("와, 메가톤 펀치! 이제 멀리 있는 친구�
 있어요!"), a destroyed good item is mourned, a nasty item is complained about and
 a nasty item ending is cheered about.
 
+`짧은별` and `짧은라라` are the same two voices as `별` and `라라`, recorded with
+a second, much shorter script (about one to three seconds per line), for players
+who find the long emotional lines distracting while playing:
+
+    get   "메가톤! 멀리까지 간다!"
+    lose  "아, 메가톤이 깨졌어."
+    end   "메가톤 끝."
+
+Both voices are used, so the pair of voices can be kept while switching between
+the long and the short version of the same voice.
+
 Recording note
 --------------
 
