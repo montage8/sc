@@ -62,6 +62,22 @@ are covered by the voice sets as well:
 
 Effects which simply run out of time stay silent, like before.
 
+`Ella` (English, feminine) is the second English set: the same emotional script
+as Ava in a different voice, so the English item chatter can be changed without
+changing the language of the game.
+
+Recording note
+--------------
+
+To fit many short lines into one speech generation, several sentences are spoken
+in one clip and then cut apart. Cutting is not done by silence alone (English
+delivery has plenty of short pauses inside a sentence): the known length of every
+sentence predicts where its boundary has to be, and a small search picks the real
+silence which matches that prediction best. The result is checked by verifying
+that every cut lands in silence and that each sentence starts and ends with at
+most a quarter of a second of silence. build_* scripts used for this are not part
+of the game.
+
 The two new sets
 ----------------
 
